@@ -1,0 +1,31 @@
+{
+  "name": "blog",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Parinaz mohamadian raouf",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "awesome-phonenumber": "^2.9.0",
+    "camelcase-keys": "^5.2.0",
+    "constant-case": "^2.0.0",
+    "mongoose": "^5.9.27",
+    "http-errors": "^1.7.2",
+    "lodash": "^4.17.11",
+    "module-alias": "^2.2.0",
+    "ms": "^2.1.1",
+    "nanoid": "^2.0.1",
+    "koa": "^2.7.0",
+    "koa-body": "^4.1.0",
+    "koa-compose": "^4.1.0",
+    "koa-qs": "^2.0.0",
+    "koa-router": "^7.4.0",
+    "koa-useragent": "^1.2.1",
+    "lodash": "^4.17.11"
+  },
+  "_moduleAliases": {
+    "~": "."
+  }
+}
