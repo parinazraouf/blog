@@ -1,0 +1,39 @@
+
+    Perl 5 module IO::Tee
+
+Lingua::Stem::Ru is a pure perl module that lets you multiplex output
+to multiple file handles.
+
+INSTALLATION
+
+You install IO::Tee by running these commands in the *nix environment:
+
+   perl Makefile.PL
+   make
+   make test (optional)
+   make install
+
+If you have a CPAN client installed, you should be able to run something like:
+
+   cpan IO::Tee
+   cpanm IO::Tee
+
+DOCUMENTATION
+
+POD format documentation is included in lib/IO/Tee.pm.
+You can read the documentation online:
+
+    https://metacpan.org/pod/IO::Tee
+
+Or read it on your terminal, using the perldoc command:
+
+    perldoc IO::Tee
+
+COPYRIGHT
+
+Copyright (C) 1998-2017 Chung-chieh Shan.
+
+AUTHOR
+
+This module was created by Chung-chieh Shan (KENSHAN),
+but is currently (as of August 2017) being maintained by Neil Bowers (NEILB).
