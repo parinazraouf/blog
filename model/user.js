@@ -6,15 +6,15 @@ const obj = require('~/lib/obj');
 const COLLECTION_NAME = db.collection('userscollections');
 
 /**
- * Create new user
- * @param {Object} data     user data
- * @param {Object} options
- * @returns {Promise<Object>}
- */
+  * Create new user
+  * @param {Object} data     user data
+  * @param {Object} options
+  * @returns {Promise<Object>}
+*/
 exports.create = (data, { returning = 'key', transaction } = {}) => {
-    const query = db(COLLECTION_NAME)
-    	.insertOne(data)
-    	.returning(obj.castArrayIfNotEmpty(returning));
+  const query = db(COLLECTION_NAME)
+    .insertOne(data)
+    .returning(obj.castArrayIfNotEmpty(returning));
 
   	if (transaction) {
     	query.transacting(transaction);
@@ -24,16 +24,16 @@ exports.create = (data, { returning = 'key', transaction } = {}) => {
 };
 
 /**
- * Update user
- * @param {Object} condition
- * @param {Object} data
- * @param {Object} options
- * @returns {Promise<Object>}
- */
+  * Update user
+  * @param {Object} condition
+  * @param {Object} data
+  * @param {Object} options
+  * @returns {Promise<Object>}
+*/
 const update = exports.update = async (condition, data, { returning = 'key', transaction } = {}) => {
     data.updatedAt = db.fn.now();
 
-  	const query = db.COLLECTION_NAME
+  	const query = db(COLLECTION_NAME)
     	.updateOne(data)
     	.where(condition)
     	.$isEmpty('deletedAt')
@@ -47,28 +47,34 @@ const update = exports.update = async (condition, data, { returning = 'key', tra
 };
 
 /**
- * Delete user
- * @param {Object} condition
- * @param {Object} options
- * @returns {Promise<Object>}
- */
+  * Delete user
+  * @param {Object} condition
+  * @param {Object} options
+  * @returns {Promise<Object>}
+*/
 exports.delete = async (condition, { returning = 'key', transaction } = {}) => {
-  	const query = db.COLLECTION_NAME
-   	 	.findOneAndDelete(condition)
-   	 	.returning(obj.castArrayIfNotEmpty(returning))
-  		.updateOne(condition, { deletedAt: db.fn.now() }, { returning, transaction });
+  const query = db(COLLECTION_NAME)
+   	.findOneAndDelete(condition)
+    .updateOne(condition, { deletedAt: db.fn.now() }, { returning, transaction })
+   	.returning(obj.castArrayIfNotEmpty(returning));
+
+    if (transaction) {
+      query.transacting(transaction);
+    }
+
+    return query;
 };
 
 /**
- * Get user by key
- * @param {String} key
- * @param {Object} projection
- * @returns {Promise<Object>}
- */
+  * Get user by key
+  * @param {String} key
+  * @param {Object} projection
+  * @returns {Promise<Object>}
+*/
 exports.getByKey = (key, projection, { checkDeletedAt = true } = {}) => {
-  	const query = db.COLLECTION_NAME
-    	.findOne(projection)
-    	.where({ key });
+  const query = db(COLLECTION_NAME)
+    .findOne(projection)
+    .where({ key });
 
   	if (checkDeletedAt) {
     	query.$isEmpty('deletedAt');
@@ -78,14 +84,14 @@ exports.getByKey = (key, projection, { checkDeletedAt = true } = {}) => {
 };
 
 /**
- * Get user by phoneNumber
- * @param {String} phoneNumber
- * @param {Object} projection
- * @returns {Promise<Object>}
- */
+  * Get user by phoneNumber
+  * @param {String} phoneNumber
+  * @param {Object} projection
+  * @returns {Promise<Object>}
+*/
 exports.getByPhoneNumber = async (phoneNumber, projection) => {
-  	db.COLLECTION_NAME
-    	.findOne(projection)
-    	.where({ phoneNumber })
-    	.$isEmpty('deletedAt');
+  db(COLLECTION_NAME)
+    .findOne(projection)
+    .where({ phoneNumber })
+    .$isEmpty('deletedAt');
 };
