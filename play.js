@@ -1,15 +1,18 @@
 require('module-alias/register');
 
-const testModelCreateUser = require('~/model/user');
+const { db } = require('~/lib/db');
+const obj = require('~/lib/obj');
+const mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
-testModelCreateUser.create({
-  key: 'a5227d6e-c716-416d-ab15-ae2d21631123',
-  phoneNumber: '9126934404',
-  createdAt: '2019-09-30 19:15:56.608629+00',
-  updatedAt: '2019-09-30 19:15:56.608629+00',
-  deletedAt: null,
+const testModelCreateUser = require('~/model/comment');
 
-
-}).then(res => {
-  console.log('////////////////////////////////////', res);
+testModelCreateUser.getAllByPostKey({
+  key: 'a5227d6e-c716-416d-ab15-ae2d21631123'
 });
+
+// .then(res => {
+//   console.log('////////////////////////////////////', res);
+// });
+
+// users.find({ phoneNumber: '9126934404' }).where('createdAt').gt(oneYearAgo).exec(callback);

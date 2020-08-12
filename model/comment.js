@@ -3,77 +3,123 @@ require('module-alias/register');
 const { db } = require('~/lib/db');
 const obj = require('~/lib/obj');
 
-const COLLECTION_NAME = db.collection('commentscollections');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const commentsSchema = new Schema({
+  id: {type:Number},
+  key: mongoose.Types.ObjectId,
+  content: {type:String},
+  attachment_key: mongoose.Types.ObjectId,
+  author_key: mongoose.Types.ObjectId,
+  post_key: mongoose.Types.ObjectId,
+  likes_count: {type:Number},
+  created_at: {type: Date, default: Date.now},
+  updated_at: {type: Date, default: Date.now},
+  deleted_at: {type: Date, default: null},
+  post: [{type: Schema.Types.ObjectId, ref: 'posts'}],
+  user: [{type: Schema.Types.ObjectId, ref: 'users'}]
+});
+
+// const COLLECTION_NAME = 'comments';
+
+const comments = mongoose.model('comments', commentsSchema);
 
 /**
   * Create new comment
   * @param {Object} data     comment data
-  * @param {Object} options
-  * @returns {Promise<Object>}
 */
-exports.create = async (data, { returning = 'key', transaction } = {}) => {
-  const query = db(COLLECTION_NAME)
-    .insertOne(data)
-    .returning(obj.castArrayIfNotEmpty(returning));
+exports.create = async (data) => {
+  const query = comments.insertMany([{ data }, {"$set": {createdAt: Date.now()}}])
 
-  if (transaction) {
-    query.transacting(transaction);
-  }
+  const createComment = new comments({ query });
 
-  return query;
+  // createComment.save();
+  createComment.save(function(err,createComment) {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log("Document save done");
+    }
+  });
 };
 
 /**
   * Update comment
   * @param {Object} condition
   * @param {Object} data
-  * @param {Object} options
-  * @returns {Promise<Object>}
 */
-const update = exports.update = async (condition, data, { returning = 'key', transaction } = {}) => {
-  data.updatedAt = db.fn.now();
+exports.update = async (condition, data) => {
+  const query = comments.findOneAndUpdate({condition}, {data}, {"$set": {updatedAt: Date.now()}})
 
-  const query = db(COLLECTION_NAME)
-    .updateOne(data)
-    .where(condition)
-    .$isEmpty('deletedAt')
-    .returning(obj.castArrayIfNotEmpty(returning));
+  const updateComment = new comments({ query });
 
-  if (transaction) {
-    query.transacting(transaction);
-  }
-
-  return query;
+  // updateComment.save();
+  updateComment.save(function(err,updateComment) {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log("Document update done");
+    }
+  });
 };
 
 /**
   * Delete comment
   * @param {Object} condition
   * @param {Object} options
-  * @returns {Promise<Object>}
 */
-exports.delete = async (condition, { returning = 'key', transaction } = {}) =>{
-  const query = db(COLLECTION_NAME)
-    .findOneAndDelete(condition)
-    .updateOne(condition, { deletedAt: db.fn.now() }, { returning, transaction })
-    .returning(obj.castArrayIfNotEmpty(returning));
+exports.delete = async (condition) => {
+  const query = comments.findOneAndDelete({condition}, {"$set": {deletedAt: Date.now()}})
 
-    if (transaction) {
-    query.transacting(transaction);
+  const deleteComment = new comments({ query });
+
+  // deleteComment.save();
+  deleteComment.save(function(err,deleteComment) {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log("Document delete done");
     }
-
-    return query;
+  });
 };
 
 /**
   * Get comment by key
   * @param {String} key
   * @param {Object} projection
-  * @returns {Promise<Object>}
 */
-exports.getByKey = (key, projection) => {
-  db(COLLECTION_NAME)
-    .findOne(projection)
-    .where({ key })
-    .$isEmpty('deletedAt');
+exports.getByKey = async (key, projection) => {
+  comments.findOne({projection}, {key}, {"$ne": {deletedAt: null}})  
+};
+
+/**
+ * Get all comments by post key
+ * @param {String}        postKey
+ * @param {String}        userKey
+ * @param {Array<String>} projection
+ */
+exports.getAllByPostKey = async (postKey, userKey, projection) => {
+  comments.findOne({projection}, {userKey}, {postKey}).populate('user').populate('post')
+};
+
+/**
+ * Get all user keys that commented on this post by post key
+ * @param {String} postKey
+ * @param {Object} userKey
+ */
+
+exports.getAllUserKeysCommented = async (postKey, userKey, { ignoreUserKeys } = {}) => {
+    comments.findOne({projection}, {userKey}, {postKey}).populate('user').populate('post')
+    // .select('authorKey')
+    // .where({ postKey });
+    
+  //   if (ignoreUserKeys) {
+  //   query.whereNotIn('authorKey', castArray(ignoreUserKeys));
+  // }
+
+  // const res = await query.whereNull('deletedAt');
+
+  // return uniq(res.map(i => i.authorKey));
+
 };

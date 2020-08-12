@@ -3,77 +3,94 @@ require('module-alias/register');
 const { db } = require('~/lib/db');
 const obj = require('~/lib/obj');
 
-const COLLECTION_NAME = db.collection('postscollections');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const postsSchema = new Schema({
+  id: {type:Number},
+  key: mongoose.Types.ObjectId,
+  content: {type:String},
+  attachment_key: mongoose.Types.ObjectId,
+  author_key: mongoose.Types.ObjectId,
+  likes_count: {type:Number},
+  comments_count: {type:Number},
+  created_at: {type: Date, default: Date.now},
+  updated_at: {type: Date, default: Date.now},
+  deleted_at: {type: Date, default: null},
+  user: [{type: Schema.Types.ObjectId, ref: 'users'}],
+  comment: [{type: Schema.Types.ObjectId, ref: 'comments'}]
+});
+
+//const COLLECTION_NAME = 'posts';
+
+const posts = mongoose.model('posts', postsSchema);
 
 /**
   * Create new post
   * @param {Object} data     post data
-  * @param {Object} options
-  * @returns {Promise<Object>}
 */
-exports.create = (data, { returning = 'key', transaction } = {}) => {
-	const query = db(COLLECTION_NAME)
-		.insertOne(data)
-		.returning(obj.castArrayIfNotEmpty(returning));
+exports.create = async (data) => {
+	const query = posts.insertMany([{ data }, {"$set": {createdAt: Date.now()}}]);
 
-	if (transaction) {
-		query.transacting(transaction);
-  }
+  const createPost = new posts({ query });
 
-	return query;
+  // createPost.save();
+  createPost.save(function(err,createPost) {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log("Document save done");
+    }
+  });
 };
 
 /**
   * Update post
   * @param {Object} condition
   * @param {Object} data
-  * @param {Object} options
-  * @returns {Promise<Object>}
 */
-const update = exports.update = async (condition, data, { returning = 'key', transaction } = {}) => {
-	data.updatedAt = db.fn.now();
+exports.update = async (condition, data) => {
+  const query = posts.findOneAndUpdate({condition}, {data}, {"$set": {updatedAt: Date.now()}});
 
-	const query = db(COLLECTION_NAME)
-		.updateOne(data)
-		.where(condition)
-		.$isEmpty('deletedAt')
-		.returning(obj.castArrayIfNotEmpty(returning));
+  const updatePost = new posts({ query });
 
-	if (transaction) {
-		query.transacting(transaction);
-	}
+  // updatePost.save();
+  updatePost.save(function(err,updatePost) {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log("Document update done");
+    }
+  });
 
-	return query;
 };
 
 /**
   * Delete post
   * @param {Object} condition
-  * @param {Object} options
-  * @returns {Promise<Object>}
 */
-exports.delete = async (condition, { returning = 'key', transaction } = {}) => {
-	const query = db(COLLECTION_NAME)
-		.findOneAndDelete(condition)
-		.updateOne(condition, { deletedAt: db.fn.now() }, { returning, transaction })
-		.returning(obj.castArrayIfNotEmpty(returning));
+exports.delete = async (condition) => {
+	const query = posts..findOneAndDelete({condition}, {"$set": {deletedAt: Date.now()}});
 
-		if (transaction) {
-      query.transacting(transaction);
+  const deletePost = new posts({ query });
+
+  // deletePost.save();
+  deletePost.save(function(err,deletePost) {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log("Document delete done");
     }
-
-    return query;
+  });
 };
 
 /**
   * Get post by key
   * @param {String} key
   * @param {Object} projection
-  * @returns {Promise<Object>}
 */
 exports.getByKey = async (key, projection) => {
-	db(COLLECTION_NAME)
-		.findOne(projection)
-		.where({ key })
-		.$isEmpty('deletedAt');
+	posts.findOne({projection}, {key}, {"$ne": {deletedAt: null}});
 };
+
+
