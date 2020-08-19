@@ -1,45 +1,45 @@
 require('module-alias/register');
 
-const { db } = require('~/lib/db');
-const obj = require('~/lib/obj');
+// const { db } = require('~/lib/db');
+// const obj = require('~/lib/obj');
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const commentsSchema = new Schema({
-  id: {type:Number},
+  id: { type: Number },
   key: mongoose.Types.ObjectId,
-  content: {type:String},
+  content: { type: String },
   attachment_key: mongoose.Types.ObjectId,
   author_key: mongoose.Types.ObjectId,
   post_key: mongoose.Types.ObjectId,
-  likes_count: {type:Number},
-  created_at: {type: Date, default: Date.now},
-  updated_at: {type: Date, default: Date.now},
-  deleted_at: {type: Date, default: null},
-  post: [{type: Schema.Types.ObjectId, ref: 'posts'}],
-  user: [{type: Schema.Types.ObjectId, ref: 'users'}]
+  likes_count: { type: Number },
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now },
+  deleted_at: { type: Date, default: null },
+  post: [{ type: Schema.Types.ObjectId, ref: 'posts' }],
+  user: [{ type: Schema.Types.ObjectId, ref: 'users' }]
 });
 
 // const COLLECTION_NAME = 'comments';
 
-const comments = mongoose.model('comments', commentsSchema);
+const Comments = mongoose.model('comments', commentsSchema);
 
 /**
   * Create new comment
   * @param {Object} data     comment data
 */
 exports.create = async (data) => {
-  const query = comments.insertMany([{ data }, {"$set": {createdAt: Date.now()}}])
+  const query = Comments.insertMany([{ data }, { '$set': { createdAt: Date.now() } }]);
 
-  const createComment = new comments({ query });
+  const createComment = new Comments({ query });
 
   // createComment.save();
-  createComment.save(function(err,createComment) {
-    if(err) {
+  createComment.save(function (err, createComment) {
+    if (err) {
       console.log(err);
     } else {
-      console.log("Document save done");
+      console.log('Document save done');
     }
   });
 };
@@ -50,16 +50,16 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  const query = comments.findOneAndUpdate({condition}, {data}, {"$set": {updatedAt: Date.now()}})
+  const query = Comments.findOneAndUpdate({ condition }, { data }, { '$set': { updatedAt: Date.now() } });
 
-  const updateComment = new comments({ query });
+  const updateComment = new Comments({ query });
 
   // updateComment.save();
-  updateComment.save(function(err,updateComment) {
-    if(err) {
+  updateComment.save(function (err, updateComment) {
+    if (err) {
       console.log(err);
     } else {
-      console.log("Document update done");
+      console.log('Document update done');
     }
   });
 };
@@ -70,16 +70,16 @@ exports.update = async (condition, data) => {
   * @param {Object} options
 */
 exports.delete = async (condition) => {
-  const query = comments.findOneAndDelete({condition}, {"$set": {deletedAt: Date.now()}})
+  const query = Comments.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
 
-  const deleteComment = new comments({ query });
+  const deleteComment = new Comments({ query });
 
   // deleteComment.save();
-  deleteComment.save(function(err,deleteComment) {
-    if(err) {
+  deleteComment.save(function (err, deleteComment) {
+    if (err) {
       console.log(err);
     } else {
-      console.log("Document delete done");
+      console.log('Document delete done');
     }
   });
 };
@@ -90,7 +90,7 @@ exports.delete = async (condition) => {
   * @param {Object} projection
 */
 exports.getByKey = async (key, projection) => {
-  comments.findOne({projection}, {key}, {"$ne": {deletedAt: null}})  
+  Comments.findOne({ projection }, { key }, { '$ne': { deletedAt: null } });
 };
 
 /**
@@ -100,7 +100,7 @@ exports.getByKey = async (key, projection) => {
  * @param {Array<String>} projection
  */
 exports.getAllByPostKey = async (postKey, userKey, projection) => {
-  comments.findOne({projection}, {userKey}, {postKey}).populate('user').populate('post')
+  Comments.findOne({ projection }, { userKey }, { postKey }).populate('user').populate('post');
 };
 
 /**
@@ -109,11 +109,9 @@ exports.getAllByPostKey = async (postKey, userKey, projection) => {
  * @param {Object} userKey
  */
 
-exports.getAllUserKeysCommented = async (postKey, userKey, { ignoreUserKeys } = {}) => {
-    comments.findOne({projection}, {userKey}, {postKey}).populate('user').populate('post')
-    // .select('authorKey')
-    // .where({ postKey });
-    
+exports.getAllUserKeysCommented = async (postKey, userKey, projection, { ignoreUserKeys } = {}) => {
+  Comments.findOne({ projection }, { userKey }, { postKey }).populate('user').populate('post');
+
   //   if (ignoreUserKeys) {
   //   query.whereNotIn('authorKey', castArray(ignoreUserKeys));
   // }
@@ -121,5 +119,4 @@ exports.getAllUserKeysCommented = async (postKey, userKey, { ignoreUserKeys } = 
   // const res = await query.whereNull('deletedAt');
 
   // return uniq(res.map(i => i.authorKey));
-
 };

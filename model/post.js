@@ -1,45 +1,42 @@
 require('module-alias/register');
 
-const { db } = require('~/lib/db');
-const obj = require('~/lib/obj');
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const postsSchema = new Schema({
-  id: {type:Number},
+  id: { type: Number },
   key: mongoose.Types.ObjectId,
-  content: {type:String},
+  content: { type: String },
   attachment_key: mongoose.Types.ObjectId,
   author_key: mongoose.Types.ObjectId,
-  likes_count: {type:Number},
-  comments_count: {type:Number},
-  created_at: {type: Date, default: Date.now},
-  updated_at: {type: Date, default: Date.now},
-  deleted_at: {type: Date, default: null},
-  user: [{type: Schema.Types.ObjectId, ref: 'users'}],
-  comment: [{type: Schema.Types.ObjectId, ref: 'comments'}]
+  likes_count: { type: Number },
+  comments_count: { type: Number },
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now },
+  deleted_at: { type: Date, default: null },
+  user: [{ type: Schema.Types.ObjectId, ref: 'users' }],
+  comment: [{ type: Schema.Types.ObjectId, ref: 'comments' }]
 });
 
-//const COLLECTION_NAME = 'posts';
+// const COLLECTION_NAME = 'posts';
 
-const posts = mongoose.model('posts', postsSchema);
+const Posts = mongoose.model('posts', postsSchema);
 
 /**
   * Create new post
   * @param {Object} data     post data
 */
 exports.create = async (data) => {
-	const query = posts.insertMany([{ data }, {"$set": {createdAt: Date.now()}}]);
+  const query = Posts.insertMany([{ data }, { '$set': { createdAt: Date.now() } }]);
 
-  const createPost = new posts({ query });
+  const createPost = new Posts({ query });
 
   // createPost.save();
-  createPost.save(function(err,createPost) {
-    if(err) {
+  createPost.save(function (err, createPost) {
+    if (err) {
       console.log(err);
     } else {
-      console.log("Document save done");
+      console.log('Document save done');
     }
   });
 };
@@ -50,19 +47,18 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  const query = posts.findOneAndUpdate({condition}, {data}, {"$set": {updatedAt: Date.now()}});
+  const query = Posts.findOneAndUpdate({ condition }, { data }, { '$set': { updatedAt: Date.now() } });
 
-  const updatePost = new posts({ query });
+  const updatePost = new Posts({ query });
 
   // updatePost.save();
-  updatePost.save(function(err,updatePost) {
-    if(err) {
+  updatePost.save(function (err, updatePost) {
+    if (err) {
       console.log(err);
     } else {
-      console.log("Document update done");
+      console.log('Document update done');
     }
   });
-
 };
 
 /**
@@ -70,16 +66,16 @@ exports.update = async (condition, data) => {
   * @param {Object} condition
 */
 exports.delete = async (condition) => {
-	const query = posts..findOneAndDelete({condition}, {"$set": {deletedAt: Date.now()}});
+  const query = Posts.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
 
-  const deletePost = new posts({ query });
+  const deletePost = new Posts({ query });
 
   // deletePost.save();
-  deletePost.save(function(err,deletePost) {
-    if(err) {
+  deletePost.save(function (err, deletePost) {
+    if (err) {
       console.log(err);
     } else {
-      console.log("Document delete done");
+      console.log('Document delete done');
     }
   });
 };
@@ -90,7 +86,23 @@ exports.delete = async (condition) => {
   * @param {Object} projection
 */
 exports.getByKey = async (key, projection) => {
-	posts.findOne({projection}, {key}, {"$ne": {deletedAt: null}});
+  Posts.findOne({ projection }, { key }, { '$ne': { deletedAt: null } });
 };
 
+/**
+  * Get all posts by user key
+  * @param {String} authorKey
+  * @param {Object} projection
+*/
+exports.getAllPostsByUserKey = async (authorKey, projection) => {
+  Posts.find({ projection }, { authorKey }, { '$ne': { deletedAt: null } });
+};
 
+/**
+  * Get all liked users list by post key
+  * @param {String} key
+  * @param {Object} projection
+*/
+exports.getAllLikedUsersListSchema = async (postKey, projection) => {
+
+};

@@ -3,19 +3,19 @@ const app = exports.app = {
   shortTextMaxLength: 80,
   summaryTextMaxLength: 120,
   longTextMaxLength: 4096,
-  passwordLengthRange: [8, 255],
+  passwordLengthRange: [8, 255]
 };
 
 exports.profile = {
   displayNameLengthRange: [2, app.shortTextMaxLength],
-  usernameLengthRange: [4, app.shortTextMaxLength],
+  usernameLengthRange: [4, app.shortTextMaxLength]
 };
 
 exports.post = {
   contentLengthRange: [1, 280],
   maxTimeToEdit: '15m',
   maxPostAttachmentsCount: 20,
-  maxPostImagesCount: 10,
+  maxPostImagesCount: 10
 };
 
 exports.comment = {

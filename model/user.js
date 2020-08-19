@@ -1,39 +1,39 @@
 require('module-alias/register');
 
-const { db } = require('~/lib/db');
-const obj = require('~/lib/obj');
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const usersSchema = new Schema({
   key: mongoose.Types.ObjectId,
-  phone_number: {type:Number},
-  created_at:  {type: Date, default: Date.now},
-  updated_at:  {type: Date, default: Date.now},
-  deleted_at:  {type: Date, default: null}
+  phone_number: { type: Number },
+  displayName: { type: String },
+  password: { type: String },
+  avatarKey: mongoose.Types.ObjectId,
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now },
+  deleted_at: { type: Date, default: null }
 });
 
-//const COLLECTION_NAME = 'users';
+// const COLLECTION_NAME = 'users';
 
-const users = mongoose.model('users', usersSchema);
+const Users = mongoose.model('users', usersSchema);
 
 /**
   * Create new user
   * @param {Object} data     user data
 */
 exports.create = async (data) => {
-  const query = users.insertMany([{ data }, {"$set": {createdAt: Date.now()}}]);
+  const query = Users.insertMany([{ data }, { '$set': { createdAt: Date.now() } }]);
 
-  console.log('////////////', query);
-  const createUser = new users({ query });
+  console.log('////////////', query); // it stays pending and wont be written in my db
+  const createUser = new Users({ query });
 
   // createUser.save();
-  createUser.save(function(err,createUser) {
-    if(err) {
+  createUser.save(function (err, createUser) {
+    if (err) {
       console.log(err);
     } else {
-      console.log("Document save done");
+      console.log('Document save done');
     }
   });
 };
@@ -44,16 +44,16 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  const query = users.findOneAndUpdate({condition}, {data}, {"$set": {updatedAt: Date.now()}});
+  const query = Users.findOneAndUpdate({ condition }, { data }, { '$set': { updatedAt: Date.now() } });
 
-  const updateUser = new users({ query });
+  const updateUser = new Users({ query });
 
   // updateUser.save();
-  updateUser.save(function(err,updateUser) {
-    if(err) {
+  updateUser.save(function (err, updateUser) {
+    if (err) {
       console.log(err);
     } else {
-      console.log("Document update done");
+      console.log('Document update done');
     }
   });
 };
@@ -63,16 +63,16 @@ exports.update = async (condition, data) => {
   * @param {Object} condition
 */
 exports.delete = async (condition) => {
-  const query = users.findOneAndDelete({condition}, {"$set": {deletedAt: Date.now()}});
+  const query = Users.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
 
-  const deleteUser = new users({ query });
+  const deleteUser = new Users({ query });
 
   // deleteUser.save();
-  deleteUser.save(function(err,deleteUser) {
-    if(err) {
+  deleteUser.save(function (err, deleteUser) {
+    if (err) {
       console.log(err);
     } else {
-      console.log("Document delete done");
+      console.log('Document delete done');
     }
   });
 };
@@ -82,8 +82,8 @@ exports.delete = async (condition) => {
   * @param {String} key
   * @param {Object} projection
 */
-exports.getByKey = async (key, projection) => {
-  users.findOne({projection}, {key}, {"$ne": {deletedAt: null}});
+exports.getUserByKey = async (key, projection) => {
+  Users.findOne({ projection }, { key }, { '$ne': { deletedAt: null } });
 };
 
 /**
@@ -91,6 +91,15 @@ exports.getByKey = async (key, projection) => {
   * @param {String} phoneNumber
   * @param {Object} projection
 */
-exports.getByPhoneNumber = async (phoneNumber, projection) => {
-  users.findOne({projection}, {phoneNumber}, {"$ne": {deletedAt: null}});    
+exports.getUserByPhoneNumber = async (phoneNumber, projection) => {
+  Users.findOne({ projection }, { phoneNumber }, { '$ne': { deletedAt: null } });
+};
+
+/**
+ * Get user by username
+ * @param {String} username
+ * @param {Object} projection
+ */
+exports.getUserByUserName = (username, projection) => {
+  Users.findOne({ projection }, { username }, { '$ne': { deletedAt: null } });
 };
