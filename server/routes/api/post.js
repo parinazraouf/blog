@@ -1,3 +1,5 @@
+require('module-alias/register');
+
 const get = require('lodash/get');
 const { httpInvariant } = require('~/lib/error');
 const { Joi } = require('../lib/validate');

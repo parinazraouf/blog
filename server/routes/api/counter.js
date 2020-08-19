@@ -1,3 +1,5 @@
+require('module-alias/register');
+
 const { Joi } = require('~/lib/validate');
 const { counter: counterEnum } = require('~/config/enum');
 const counterModel = require('~/model/counter');

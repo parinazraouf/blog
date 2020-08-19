@@ -1,3 +1,5 @@
+require('module-alias/register');
+
 const { httpInvariant } = require('~/lib/error');
 const { Joi } = require('~/lib/validate');
 const { user: userLimit } = require('~/config/limit');
