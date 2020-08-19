@@ -1,3 +1,5 @@
+require('module-alias/register');
+
 const Koa = require('koa');
 const body = require('koa-body');
 const qs = require('koa-qs');

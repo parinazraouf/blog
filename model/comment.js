@@ -1,8 +1,3 @@
-require('module-alias/register');
-
-// const { db } = require('~/lib/db');
-// const obj = require('~/lib/obj');
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
