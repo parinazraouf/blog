@@ -5,7 +5,7 @@
   "author": "Parinaz mohamadian raouf",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node ."
   },
   "dependencies": {
     "awesome-phonenumber": "^2.9.0",
