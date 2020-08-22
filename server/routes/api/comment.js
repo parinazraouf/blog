@@ -48,7 +48,7 @@ module.exports = router => {
     content: Joi.string().min(commentLimit.contentLengthRange[0]).max(commentLimit.contentLengthRange[1]).required().trim()
   });
 
-  router.post('/api/post/comment/create/:key', async ctx => {
+  router.post('/post/comment/create/:key', async ctx => {
     const { key, content } = Joi.attempt({ ...ctx.request.body, key: ctx.params.key }, sendCommentSchema);
     const userKey = ctx.state.user.key;
 
@@ -71,7 +71,7 @@ module.exports = router => {
     content: Joi.string().min(commentLimit.contentLengthRange[0]).max(commentLimit.contentLengthRange[1]).required().trim()
   });
 
-  router.put('/api/post/comment/edit/:key', async ctx => {
+  router.put('/post/comment/edit/:key', async ctx => {
     const { key, content } = Joi.attempt({ ...ctx.request.body, key: ctx.params.key }, editCommentSchema);
     const userKey = ctx.state.user.key;
 
@@ -95,7 +95,7 @@ module.exports = router => {
     key: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
-  router.delete('/api/post/comment/delete/:key', async ctx => {
+  router.delete('/post/comment/delete/:key', async ctx => {
     const { key } = Joi.attempt(ctx.params, deleteCommentSchema);
     const userKey = ctx.state.user.key;
 
@@ -119,7 +119,7 @@ module.exports = router => {
     key: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
-  router.put('/api/post/comment/like/:key', async ctx => {
+  router.put('/post/comment/like/:key', async ctx => {
     const { key } = Joi.attempt(ctx.params, likeCommentSchema);
     const userKey = ctx.state.user.key;
 
@@ -156,7 +156,7 @@ module.exports = router => {
     key: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
-  router.get('/api/post/comment/all/:key', async ctx => {
+  router.get('/post/comment/all/:key', async ctx => {
     const { key } = Joi.attempt(ctx.params.key, getAllPostCommentsSchema);
     const userKey = get(ctx.state, 'user.key');
 

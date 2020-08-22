@@ -1,8 +1,3 @@
-const { db } = require('~/lib/db');
-const obj = require('~/lib/obj');
-const mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-
 const testModelCreateUser = require('~/model/comment');
 
 testModelCreateUser.getAllByPostKey({

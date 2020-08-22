@@ -25,7 +25,7 @@ module.exports = router => {
     value: Joi.number().min(1).max(5)
   });
 
-  router.put('/api/counter/create', async ctx => {
+  router.put('/counter/create', async ctx => {
     const data = Joi.attempt(ctx.request.body, addCounterSchema);
 
     const res = await counterModel.upsert(data);
@@ -39,7 +39,7 @@ module.exports = router => {
     counterField: Joi.string()
   });
 
-  router.get('/api/counter/target/:targetKey/type/:targetType/counterField/:counterField', async ctx => {
+  router.get('/counter/target/:targetKey/type/:targetType/counterField/:counterField', async ctx => {
     const {
       targetKey,
       targetType,

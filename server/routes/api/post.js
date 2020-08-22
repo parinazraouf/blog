@@ -54,7 +54,7 @@ module.exports = router => {
       .max(postLimit.maxPostImagesCount)
   });
 
-  router.post('/api/post/create', async ctx => {
+  router.post('/post/create', async ctx => {
     const data = Joi.attempt(ctx.request.body, createPostSchema);
     const userKey = ctx.state.user.key;
 
@@ -74,7 +74,7 @@ module.exports = router => {
       .trim()
   });
 
-  router.put('/api/post/edit/:key', async ctx => {
+  router.put('/post/edit/:key', async ctx => {
     const { key, content } = Joi.attempt({
       ...ctx.request.body,
       key: ctx.params.key
@@ -101,7 +101,7 @@ module.exports = router => {
     key: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
-  router.delete('/api/post/delete/:key', async ctx => {
+  router.delete('/post/delete/:key', async ctx => {
     const { key } = Joi.attempt(ctx.params, deletePostSchema);
     const userKey = ctx.state.user.key;
 
@@ -121,7 +121,7 @@ module.exports = router => {
     key: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
-  router.put('/api/post/like/:key', async ctx => {
+  router.put('/post/like/:key', async ctx => {
     const { key } = Joi.attempt(ctx.params, likePostSchema);
     const userKey = ctx.state.user.key;
 
@@ -154,7 +154,7 @@ module.exports = router => {
   // const getAllUserPostsSchema = Joi.object().keys({
   // });
 
-  router.get('/api/user/alluserposts', async ctx => {
+  router.get('/user/alluserposts', async ctx => {
     const userKey = get(ctx.state, 'user.key');
 
     // Check user existence
@@ -171,7 +171,7 @@ module.exports = router => {
     key: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
-  router.get('/api/post/like/list/:key', async ctx => {
+  router.get('/post/like/list/:key', async ctx => {
     const { key } = Joi.attempt(ctx.params.key, getAllLikedUsersListSchema);
 
     const post = await postModel.getByKey(key, ['key']);
@@ -187,7 +187,7 @@ module.exports = router => {
     key: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
-  router.get('/api/post/key/:key', async ctx => {
+  router.get('/post/key/:key', async ctx => {
     const { key } = Joi.attempt(ctx.params.key, getPostByKeySchema);
 
     const post = await postModel.getByKey(key, ['key']);

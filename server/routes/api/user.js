@@ -33,7 +33,7 @@ module.exports = router => {
     avatarKey: Joi.string().uuid({ version: 'uuidv4' }).allow(null)
   });
 
-  router.post('/api/user/create', async ctx => {
+  router.post('/user/create', async ctx => {
     const data = Joi.attempt(ctx.request.body, createUserSchema);
 
     // Insert `user` record
@@ -54,7 +54,7 @@ module.exports = router => {
     password: Joi.string().min(appLimit.passwordLengthRange[0]).max(appLimit.passwordLengthRange[1])
   });
 
-  router.put('/api/user/edit', async ctx => {
+  router.put('/user/edit', async ctx => {
     const data = Joi.attempt(ctx.request.body, editUserSchema);
     const userKey = ctx.state.user.key;
 
@@ -83,7 +83,7 @@ module.exports = router => {
     key: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
-  router.delete('/api/user/delete', async ctx => {
+  router.delete('/user/delete', async ctx => {
     const { key } = Joi.attempt(ctx.params, deleteUserSchema);
 
     // Check user existence
@@ -100,7 +100,7 @@ module.exports = router => {
     key: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
-  router.get('/api/user/key/:key', async ctx => {
+  router.get('/user/key/:key', async ctx => {
     const { key } = Joi.attempt(ctx.params, getUserByKeySchema);
     const userKey = ctx.state.user.key;
 
@@ -117,7 +117,7 @@ module.exports = router => {
     userName: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
-  router.get('/api/user/username/:username', async ctx => {
+  router.get('/user/username/:username', async ctx => {
     const { userName } = Joi.attempt(ctx.params, getUserByUsernameSchema);
 
     const user = await userModel.getUserByUserName(userName, ['key', 'username']);
@@ -131,7 +131,7 @@ module.exports = router => {
     phoneNumber: Joi.phoneNumber().irMobile().required()
   });
 
-  router.get('/api/user/phonenumber/:phonenumber', async ctx => {
+  router.get('/user/phonenumber/:phonenumber', async ctx => {
     const { phoneNumber } = Joi.attempt(ctx.params, getUserByPhonenumberSchema);
 
     const user = await userModel.getUserByPhoneNumber(phoneNumber, ['key', 'phonenumber']);
@@ -147,7 +147,7 @@ module.exports = router => {
 
   // Check username existence
   // This api will return `false` if username doesn't exist and `true` if username is aleady exist
-  router.get('/api/user/username/:username/check', async ctx => {
+  router.get('/user/username/:username/check', async ctx => {
     const { username } = Joi.attempt(ctx.params, checkUsernameExistenceSchema);
 
     // Check username existence
