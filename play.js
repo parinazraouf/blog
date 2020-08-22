@@ -1,3 +1,5 @@
+require('module-alias/register');
+
 const testModelCreateUser = require('~/model/comment');
 
 testModelCreateUser.getAllByPostKey({
