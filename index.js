@@ -9,4 +9,4 @@ app.listen(PORT, HOST);
 
 console.log(`Running on http://${HOST}:${PORT}`);
 
-const model = require('~/comment');
+const model = require('~/model/comment');

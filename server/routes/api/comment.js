@@ -5,9 +5,9 @@ const { httpInvariant } = require('~/lib/error');
 const { Joi } = require('~/lib/validate');
 const { counter: counterEnum } = require('~/config/enum');
 const { comment: commentLimit } = require('~/config/limit');
-const commentModel = require('~/model/post/comment');
+const commentModel = require('~/model/comment');
 const postModel = require('~/model/post');
-const request = require('~/lib/request');
+const counterModel = require('~/model/counter');
 
 const {
   app: appError,
@@ -139,17 +139,17 @@ module.exports = router => {
     // Check if user exists or doesn't
     httpInvariant(post, ...appError.forbiddenAccess);
 
-    const { body: { data: res } } = await request('PUT', `/api/counter/create`, {
-      targetKey: key,
-      targetType: counterEnum.targetType.comment,
-      counterField: 'likesCount',
-      userKey
-    });
+    // const { body: { data: res } } = await counterModel.upsert, {
+    //   targetKey: key,
+    //   targetType: counterEnum.targetType.comment,
+    //   counterField: 'likesCount',
+    //   userKey
+    // };
 
-    // Total count
-    const total = res.value ? +comment.likesCount + 1 : +comment.likesCount - 1;
+    // // Total count
+    // const total = res.value ? +comment.likesCount + 1 : +comment.likesCount - 1;
 
-    ctx.bodyOk({ total });
+    // ctx.bodyOk({ total });
   });
 
   const getAllPostCommentsSchema = Joi.object().keys({

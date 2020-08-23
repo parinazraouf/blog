@@ -2,13 +2,13 @@ require('module-alias/register');
 
 const get = require('lodash/get');
 const { httpInvariant } = require('~/lib/error');
-const { Joi } = require('../lib/validate');
+const { Joi } = require('~/lib/validate');
 const { counter: counterEnum } = require('~/config/enum');
 const ms = require('ms');
 const { post: postLimit } = require('~/config/limit');
 const postModel = require('~/model/post');
 const userModel = require('~/model/user');
-const request = require('~/lib/request');
+const counterModel = require('~/model/counter');
 
 const {
   app: appError,
@@ -138,17 +138,17 @@ module.exports = router => {
 
     // TODO
 
-    const { body: { data: res } } = await request('PUT', `/api/counter/create`, {
-      targetKey: key,
-      targetType: counterEnum.targetType.post,
-      counterField: 'likesCount',
-      userKey
-    });
+    // const { body: { data: res } } = await counterModel.upsert, {
+    //   targetKey: key,
+    //   targetType: counterEnum.targetType.post,
+    //   counterField: 'likesCount',
+    //   userKey
+    // };
 
-    // Total count
-    const total = res.value ? +post.likesCount + 1 : +post.likesCount - 1;
+    // // Total count
+    // const total = res.value ? +post.likesCount + 1 : +post.likesCount - 1;
 
-    ctx.bodyOk({ total });
+    // ctx.bodyOk({ total });
   });
 
   // const getAllUserPostsSchema = Joi.object().keys({
