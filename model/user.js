@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const db = require('~/db');
-mongoose.connect(db);
+
+// mongoose.connect('mongodb://localhost:27017/blogdb', { useNewUrlParser: true });
+// const db = require('~/db');
+// mongoose.connect(db);
 
 const usersSchema = new Schema({
   key: mongoose.Types.ObjectId,
