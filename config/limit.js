@@ -6,7 +6,7 @@ const app = exports.app = {
   passwordLengthRange: [8, 255]
 };
 
-exports.profile = {
+exports.user = {
   displayNameLengthRange: [2, app.shortTextMaxLength],
   usernameLengthRange: [4, app.shortTextMaxLength]
 };
