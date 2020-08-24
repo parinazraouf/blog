@@ -1,13 +1,12 @@
 require('module-alias/register');
 
-const testModelCreateUser = require('~/model/comment');
+const testModelCreateUser = require('~/model/user');
 
-testModelCreateUser.getAllByPostKey({
-  key: 'a5227d6e-c716-416d-ab15-ae2d21631123'
+const res = testModelCreateUser.create({
+  key: 'a5227d6e-c716-416d-ab15-ae2d21631123',
+  phoneNumber: 9126933608,
+  displayName: 'samantha fox',
+  password: '123456'
 });
 
-// .then(res => {
-//   console.log('////////////////////////////////////', res);
-// });
-
-// users.find({ phoneNumber: '9126934404' }).where('createdAt').gt(oneYearAgo).exec(callback);
+console.log('/...................', res);

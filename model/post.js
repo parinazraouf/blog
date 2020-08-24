@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const dbUrl = 'mongodb://localhost:27017/blogdb';
+mongoose.connect(dbUrl);
 
 // mongoose.connect('mongodb://localhost:27017/blogdb', { useNewUrlParser: true });
 // const db = require('~/lib/db');
@@ -20,8 +22,6 @@ const postsSchema = new Schema({
   comment: [{ type: Schema.Types.ObjectId, ref: 'comments' }]
 });
 
-// const COLLECTION_NAME = 'posts';
-
 const Posts = mongoose.model('posts', postsSchema);
 
 /**
@@ -29,7 +29,7 @@ const Posts = mongoose.model('posts', postsSchema);
   * @param {Object} data     post data
 */
 exports.create = async (data) => {
-  const query = Posts.insertMany([{ data }, { '$set': { createdAt: Date.now() } }]);
+  const query = await Posts.insertMany([{ data }, { '$set': { createdAt: Date.now() } }]);
 
   const createPost = new Posts({ query });
 
@@ -38,7 +38,7 @@ exports.create = async (data) => {
     if (err) {
       console.log(err);
     } else {
-      console.log('Document save done');
+      console.log('Document save done', query);
     }
   });
 };
@@ -49,7 +49,7 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  const query = Posts.findOneAndUpdate({ condition }, { data }, { '$set': { updatedAt: Date.now() } });
+  const query = await Posts.findOneAndUpdate({ condition }, { data }, { '$set': { updatedAt: Date.now() } });
 
   const updatePost = new Posts({ query });
 
@@ -68,7 +68,7 @@ exports.update = async (condition, data) => {
   * @param {Object} condition
 */
 exports.delete = async (condition) => {
-  const query = Posts.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
+  const query = await Posts.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
 
   const deletePost = new Posts({ query });
 

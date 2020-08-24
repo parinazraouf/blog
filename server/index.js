@@ -1,3 +1,5 @@
+require('module-alias/register');
+
 const Koa = require('koa');
 const koaBody = require('koa-body');
 const routers = require('./routes');

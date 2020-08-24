@@ -136,19 +136,17 @@ module.exports = router => {
 
     httpInvariant(post, ...postError.postNotFound);
 
-    // TODO
+    const { body: { data: res } } = await counterModel.upsert({
+      targetKey: key,
+      targetType: counterEnum.targetType.post,
+      counterField: 'likesCount',
+      userKey
+    });
 
-    // const { body: { data: res } } = await counterModel.upsert, {
-    //   targetKey: key,
-    //   targetType: counterEnum.targetType.post,
-    //   counterField: 'likesCount',
-    //   userKey
-    // };
+    // Total count
+    const total = res.value ? +post.likesCount + 1 : +post.likesCount - 1;
 
-    // // Total count
-    // const total = res.value ? +post.likesCount + 1 : +post.likesCount - 1;
-
-    // ctx.bodyOk({ total });
+    ctx.bodyOk({ total });
   });
 
   // const getAllUserPostsSchema = Joi.object().keys({

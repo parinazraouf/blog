@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const dbUrl = 'mongodb://localhost:27017/blogdb';
+mongoose.connect(dbUrl);
 
 // mongoose.connect('mongodb://localhost:27017/blogdb', { useNewUrlParser: true });
 // const db = require('~/lib/db');
@@ -28,7 +30,7 @@ const Counters = mongoose.model('counters', countersSchema);
  * @returns {Promise<Object>}
  */
 exports.upsert = async (data) => {
-  const query = Counters.insertMany([{ data }, { '$set': { createdAt: Date.now() } }]);
+  const query = await Counters.insertMany([{ data }, { '$set': { createdAt: Date.now() } }]);
 
   const createCounter = new Counters({ query });
 

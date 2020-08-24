@@ -1,3 +1,5 @@
+require('module-alias/register');
+
 const Router = require('koa-router');
 const compose = require('koa-compose');
 

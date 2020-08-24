@@ -139,17 +139,17 @@ module.exports = router => {
     // Check if user exists or doesn't
     httpInvariant(post, ...appError.forbiddenAccess);
 
-    // const { body: { data: res } } = await counterModel.upsert, {
-    //   targetKey: key,
-    //   targetType: counterEnum.targetType.comment,
-    //   counterField: 'likesCount',
-    //   userKey
-    // };
+    const { body: { data: res } } = await counterModel.upsert({
+      targetKey: key,
+      targetType: counterEnum.targetType.comment,
+      counterField: 'likesCount',
+      userKey
+    });
 
-    // // Total count
-    // const total = res.value ? +comment.likesCount + 1 : +comment.likesCount - 1;
+    // Total count
+    const total = res.value ? +comment.likesCount + 1 : +comment.likesCount - 1;
 
-    // ctx.bodyOk({ total });
+    ctx.bodyOk({ total });
   });
 
   const getAllPostCommentsSchema = Joi.object().keys({

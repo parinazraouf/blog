@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const dbUrl = 'mongodb://localhost:27017/blogdb';
+mongoose.connect(dbUrl);
 
 // mongoose.connect('mongodb://localhost:27017/blogdb', { useNewUrlParser: true });
 // const db = require('~/lib/db');
@@ -16,8 +18,6 @@ const usersSchema = new Schema({
   deleted_at: { type: Date, default: null }
 });
 
-// const COLLECTION_NAME = 'users';
-
 const Users = mongoose.model('users', usersSchema);
 
 /**
@@ -25,7 +25,7 @@ const Users = mongoose.model('users', usersSchema);
   * @param {Object} data     user data
 */
 exports.create = async (data) => {
-  const query = Users.insertMany([{ data }, { '$set': { createdAt: Date.now() } }]);
+  const query = await Users.insertMany([{ data }, { '$set': { createdAt: Date.now() } }]);
 
   console.log('////////////', query); // it stays pending and wont be written in my db
   const createUser = new Users({ query });
@@ -46,7 +46,7 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  const query = Users.findOneAndUpdate({ condition }, { data }, { '$set': { updatedAt: Date.now() } });
+  const query = await Users.findOneAndUpdate({ condition }, { data }, { '$set': { updatedAt: Date.now() } });
 
   const updateUser = new Users({ query });
 
@@ -65,7 +65,7 @@ exports.update = async (condition, data) => {
   * @param {Object} condition
 */
 exports.delete = async (condition) => {
-  const query = Users.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
+  const query = await Users.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
 
   const deleteUser = new Users({ query });
 
