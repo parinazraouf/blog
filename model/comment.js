@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const dbUrl = 'mongodb://localhost:27017/blogdb';
-mongoose.connect(dbUrl);
+mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
 // mongoose.connect('mongodb://localhost:27017/blogdb', { useNewUrlParser: true });
 // const db = require('~/lib/db');
@@ -9,11 +9,11 @@ mongoose.connect(dbUrl);
 
 const commentsSchema = new Schema({
   id: { type: Number },
-  key: mongoose.Types.ObjectId,
+  key: { type: mongoose.Types.ObjectId },
   content: { type: String },
-  attachment_key: mongoose.Types.ObjectId,
-  author_key: mongoose.Types.ObjectId,
-  post_key: mongoose.Types.ObjectId,
+  attachment_key: { type: mongoose.Types.ObjectId },
+  author_key: { type: mongoose.Types.ObjectId },
+  post_key: { type: mongoose.Types.ObjectId },
   likes_count: { type: Number },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
@@ -29,7 +29,7 @@ const Comments = mongoose.model('comments', commentsSchema);
   * @param {Object} data     comment data
 */
 exports.create = async (data) => {
-  const query = await Comments.insertMany([{ data }, { '$set': { createdAt: Date.now() } }]);
+  const query = Comments.create([{ ...data }, { '$set': { createdAt: Date.now() } }]);
 
   const createComment = new Comments({ query });
 
@@ -49,7 +49,7 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  const query = await Comments.findOneAndUpdate({ condition }, { data }, { '$set': { updatedAt: Date.now() } });
+  const query = Comments.findOneAndUpdate({ condition }, { ...data }, { '$set': { updatedAt: Date.now() } });
 
   const updateComment = new Comments({ query });
 
@@ -69,7 +69,7 @@ exports.update = async (condition, data) => {
   * @param {Object} options
 */
 exports.delete = async (condition) => {
-  const query = await Comments.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
+  const query = Comments.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
 
   const deleteComment = new Comments({ query });
 

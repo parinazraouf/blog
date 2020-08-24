@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const dbUrl = 'mongodb://localhost:27017/blogdb';
-mongoose.connect(dbUrl);
+mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
 // mongoose.connect('mongodb://localhost:27017/blogdb', { useNewUrlParser: true });
 // const db = require('~/lib/db');
@@ -9,11 +9,11 @@ mongoose.connect(dbUrl);
 
 const countersSchema = new Schema({
   id: { type: Number },
-  target_key: mongoose.Types.ObjectId,
+  target_key: { type: mongoose.Types.ObjectId },
   target_type: { type: Number },
   counter_field: { type: String },
   value: { type: Number },
-  user_key: mongoose.Types.ObjectId,
+  user_key: { type: mongoose.Types.ObjectId },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
   deleted_at: { type: Date, default: null },
@@ -30,7 +30,7 @@ const Counters = mongoose.model('counters', countersSchema);
  * @returns {Promise<Object>}
  */
 exports.upsert = async (data) => {
-  const query = await Counters.insertMany([{ data }, { '$set': { createdAt: Date.now() } }]);
+  const query = Counters.create([{ ...data }, { '$set': { createdAt: Date.now() } }]);
 
   const createCounter = new Counters({ query });
 

@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const dbUrl = 'mongodb://localhost:27017/blogdb';
-mongoose.connect(dbUrl);
+mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
 // mongoose.connect('mongodb://localhost:27017/blogdb', { useNewUrlParser: true });
 // const db = require('~/lib/db');
 // mongoose.connect(db);
 
 const usersSchema = new Schema({
-  key: mongoose.Types.ObjectId,
+  key: { type: mongoose.Types.ObjectId },
   phone_number: { type: Number },
   displayName: { type: String },
   password: { type: String },
-  avatarKey: mongoose.Types.ObjectId,
+  avatarKey: { type: mongoose.Types.ObjectId },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
   deleted_at: { type: Date, default: null }
@@ -25,9 +25,8 @@ const Users = mongoose.model('users', usersSchema);
   * @param {Object} data     user data
 */
 exports.create = async (data) => {
-  const query = await Users.insertMany([{ data }, { '$set': { createdAt: Date.now() } }]);
+  const query = Users.create({ ...data }, { '$set': { createdAt: Date.now() } });
 
-  console.log('////////////', query); // it stays pending and wont be written in my db
   const createUser = new Users({ query });
 
   // createUser.save();
@@ -46,7 +45,7 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  const query = await Users.findOneAndUpdate({ condition }, { data }, { '$set': { updatedAt: Date.now() } });
+  const query = Users.findOneAndUpdate({ condition }, { ...data }, { '$set': { updatedAt: Date.now() } });
 
   const updateUser = new Users({ query });
 
@@ -65,7 +64,7 @@ exports.update = async (condition, data) => {
   * @param {Object} condition
 */
 exports.delete = async (condition) => {
-  const query = await Users.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
+  const query = Users.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
 
   const deleteUser = new Users({ query });
 

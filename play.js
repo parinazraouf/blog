@@ -1,12 +1,14 @@
 require('module-alias/register');
+const mongoose = require('mongoose');
 
 const testModelCreateUser = require('~/model/user');
 
 const res = testModelCreateUser.create({
-  key: 'a5227d6e-c716-416d-ab15-ae2d21631123',
-  phoneNumber: 9126933608,
-  displayName: 'samantha fox',
-  password: '123456'
+  key: '53cb6b9b4f4ddef1ad47f943',
+  phoneNumber: 937603274,
+  displayName: 'pariiiiiiiiiiiiiiiiiiiiinazzzzzzzzzzzzzzz',
+  password: '23456'
 });
 
 console.log('/...................', res);
+console.log(mongoose.Types.ObjectId.isValid('53cb6b9b4f4ddef1ad47f943'));
