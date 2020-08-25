@@ -30,7 +30,7 @@ const Counters = mongoose.model('counters', countersSchema);
  * @returns {Promise<Object>}
  */
 exports.upsert = async (data) => {
-  const query = Counters.create([{ ...data }, { '$set': { createdAt: Date.now() } }]);
+  const query = Counters.create({ ...data }, { '$set': { createdAt: Date.now() } });
 
   const createCounter = new Counters({ query });
 

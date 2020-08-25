@@ -29,7 +29,7 @@ const Comments = mongoose.model('comments', commentsSchema);
   * @param {Object} data     comment data
 */
 exports.create = async (data) => {
-  const query = Comments.create([{ ...data }, { '$set': { createdAt: Date.now() } }]);
+  const query = Comments.create({ ...data }, { '$set': { createdAt: Date.now() } });
 
   const createComment = new Comments({ query });
 

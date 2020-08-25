@@ -29,7 +29,7 @@ const Posts = mongoose.model('posts', postsSchema);
   * @param {Object} data     post data
 */
 exports.create = async (data) => {
-  const query = Posts.create([{ ...data }, { '$set': { createdAt: Date.now() } }]);
+  const query = Posts.create({ ...data }, { '$set': { createdAt: Date.now() } });
 
   const createPost = new Posts({ query });
 
