@@ -3,10 +3,6 @@ const Schema = mongoose.Schema;
 const dbUrl = 'mongodb://localhost:27017/blogdb';
 mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
-// mongoose.connect('mongodb://localhost:27017/blogdb', { useNewUrlParser: true });
-// const db = require('~/lib/db');
-// mongoose.connect(db);
-
 const commentsSchema = new Schema({
   id: { type: Number },
   key: { type: mongoose.Types.ObjectId },
@@ -29,11 +25,8 @@ const Comments = mongoose.model('comments', commentsSchema);
   * @param {Object} data     comment data
 */
 exports.create = async (data) => {
-  const query = Comments.create({ ...data }, { '$set': { createdAt: Date.now() } });
+  const createComment = new Comments({ ...data });
 
-  const createComment = new Comments({ query });
-
-  // createComment.save();
   createComment.save(function (err, createComment) {
     if (err) {
       console.log(err);
@@ -49,18 +42,8 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  const query = Comments.findOneAndUpdate({ condition }, { ...data }, { '$set': { updatedAt: Date.now() } });
-
-  const updateComment = new Comments({ query });
-
-  // updateComment.save();
-  updateComment.save(function (err, updateComment) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('Document update done');
-    }
-  });
+  Comments.findOne({ condition })
+    .then(query => Comments.updateOne({ ...data, updatedAt: Date.now() }));
 };
 
 /**
@@ -69,17 +52,8 @@ exports.update = async (condition, data) => {
   * @param {Object} options
 */
 exports.delete = async (condition) => {
-  const query = Comments.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
-
-  const deleteComment = new Comments({ query });
-
-  // deleteComment.save();
-  deleteComment.save(function (err, deleteComment) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('Document delete done');
-    }
+  Comments.deleteOne(condition, function (err) {
+    if (err) console.log(err);
   });
 };
 

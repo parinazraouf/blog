@@ -3,10 +3,6 @@ const Schema = mongoose.Schema;
 const dbUrl = 'mongodb://localhost:27017/blogdb';
 mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
-// mongoose.connect('mongodb://localhost:27017/blogdb', { useNewUrlParser: true });
-// const db = require('~/lib/db');
-// mongoose.connect(db);
-
 const countersSchema = new Schema({
   id: { type: Number },
   target_key: { type: mongoose.Types.ObjectId },
@@ -30,11 +26,8 @@ const Counters = mongoose.model('counters', countersSchema);
  * @returns {Promise<Object>}
  */
 exports.upsert = async (data) => {
-  const query = Counters.create({ ...data }, { '$set': { createdAt: Date.now() } });
+  const createCounter = new Counters({ ...data });
 
-  const createCounter = new Counters({ query });
-
-  // createCounter.save();
   createCounter.save(function (err, createCounter) {
     if (err) {
       console.log(err);

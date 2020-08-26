@@ -1,15 +1,11 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const dbUrl = 'mongodb://localhost:27017/blogdb';
-mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
-
-// mongoose.connect('mongodb://localhost:27017/blogdb', { useNewUrlParser: true });
-// const db = require('~/lib/db');
-// mongoose.connect(db);
+mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false });
 
 const usersSchema = new Schema({
   key: { type: mongoose.Types.ObjectId },
-  phone_number: { type: Number },
+  phoneNumber: { type: String },
   displayName: { type: String },
   password: { type: String },
   avatarKey: { type: mongoose.Types.ObjectId },
@@ -25,11 +21,8 @@ const Users = mongoose.model('users', usersSchema);
   * @param {Object} data     user data
 */
 exports.create = async (data) => {
-  const query = Users.create({ ...data }, { '$set': { createdAt: Date.now() } });
+  const createUser = new Users({ ...data });
 
-  const createUser = new Users({ query });
-
-  // createUser.save();
   createUser.save(function (err, createUser) {
     if (err) {
       console.log(err);
@@ -45,18 +38,8 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  const query = Users.findOneAndUpdate({ condition }, { ...data }, { '$set': { updatedAt: Date.now() } });
-
-  const updateUser = new Users({ query });
-
-  // updateUser.save();
-  updateUser.save(function (err, updateUser) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('Document update done');
-    }
-  });
+  Users.findOne({ condition })
+    .then(query => Users.updateOne({ ...data, updatedAt: Date.now() }));
 };
 
 /**
@@ -64,17 +47,8 @@ exports.update = async (condition, data) => {
   * @param {Object} condition
 */
 exports.delete = async (condition) => {
-  const query = Users.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
-
-  const deleteUser = new Users({ query });
-
-  // deleteUser.save();
-  deleteUser.save(function (err, deleteUser) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('Document delete done');
-    }
+  Users.deleteOne(condition, function (err) {
+    if (err) console.log(err);
   });
 };
 

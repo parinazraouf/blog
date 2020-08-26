@@ -3,10 +3,6 @@ const Schema = mongoose.Schema;
 const dbUrl = 'mongodb://localhost:27017/blogdb';
 mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
-// mongoose.connect('mongodb://localhost:27017/blogdb', { useNewUrlParser: true });
-// const db = require('~/lib/db');
-// mongoose.connect(db);
-
 const postsSchema = new Schema({
   id: { type: Number },
   key: { type: mongoose.Types.ObjectId },
@@ -29,16 +25,13 @@ const Posts = mongoose.model('posts', postsSchema);
   * @param {Object} data     post data
 */
 exports.create = async (data) => {
-  const query = Posts.create({ ...data }, { '$set': { createdAt: Date.now() } });
+  const createPost = new Posts({ ...data });
 
-  const createPost = new Posts({ query });
-
-  // createPost.save();
   createPost.save(function (err, createPost) {
     if (err) {
       console.log(err);
     } else {
-      console.log('Document save done', query);
+      console.log('Document save done');
     }
   });
 };
@@ -49,18 +42,8 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  const query = Posts.findOneAndUpdate({ condition }, { ...data }, { '$set': { updatedAt: Date.now() } });
-
-  const updatePost = new Posts({ query });
-
-  // updatePost.save();
-  updatePost.save(function (err, updatePost) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('Document update done');
-    }
-  });
+  Posts.findOne({ condition })
+    .then(query => Posts.updateOne({ ...data, updatedAt: Date.now() }));
 };
 
 /**
@@ -68,17 +51,8 @@ exports.update = async (condition, data) => {
   * @param {Object} condition
 */
 exports.delete = async (condition) => {
-  const query = Posts.findOneAndDelete({ condition }, { '$set': { deletedAt: Date.now() } });
-
-  const deletePost = new Posts({ query });
-
-  // deletePost.save();
-  deletePost.save(function (err, deletePost) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('Document delete done');
-    }
+  Posts.deleteOne(condition, function (err) {
+    if (err) console.log(err);
   });
 };
 
