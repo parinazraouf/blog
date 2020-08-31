@@ -63,7 +63,10 @@ exports.delete = async (condition) => {
   * @param {Object} projection
 */
 exports.getByKey = async (key, projection) => {
-  Comments.findOne({ projection }, { key }, { '$ne': { deletedAt: null } });
+  Comments.findOne(key, projection)
+    .then(res => {
+      console.log(res);
+    });
 };
 
 /**
@@ -73,7 +76,10 @@ exports.getByKey = async (key, projection) => {
  * @param {Array<String>} projection
  */
 exports.getAllByPostKey = async (postKey, userKey, projection) => {
-  Comments.findOne({ projection }, { userKey }, { postKey }).populate('user').populate('post');
+  Comments.find(postKey, userKey, projection).populate('user').populate('post')
+    .then(res => {
+      console.log(res);
+    });
 };
 
 /**
@@ -83,7 +89,10 @@ exports.getAllByPostKey = async (postKey, userKey, projection) => {
  */
 
 exports.getAllUserKeysCommented = async (postKey, userKey, projection, { ignoreUserKeys } = {}) => {
-  Comments.findOne({ projection }, { userKey }, { postKey }).populate('user').populate('post');
+  Comments.findOne(postKey, userKey, projection).populate('user').populate('post')
+    .then(res => {
+      console.log(res);
+    });
 
   //   if (ignoreUserKeys) {
   //   query.whereNotIn('authorKey', castArray(ignoreUserKeys));

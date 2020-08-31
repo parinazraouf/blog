@@ -44,5 +44,8 @@ exports.upsert = async (data) => {
  * @param {String} counterField
 */
 exports.getByTarget = async (targetKey, targetType, counterField) => {
-  Counters.find({ targetType }, { targetKey }, { counterField });
+  Counters.find(targetKey, targetType, counterField)
+    .then(res => {
+      console.log(res);
+    });
 };

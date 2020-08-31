@@ -7,10 +7,10 @@ const postsSchema = new Schema({
   id: { type: Number },
   key: { type: mongoose.Types.ObjectId },
   content: { type: String },
-  attachment_key: { type: mongoose.Types.ObjectId },
-  author_key: { type: mongoose.Types.ObjectId },
-  likes_count: { type: Number },
-  comments_count: { type: Number },
+  attachmentKey: { type: mongoose.Types.ObjectId },
+  authorKey: { type: mongoose.Types.ObjectId },
+  likesCount: { type: Number },
+  commentsCount: { type: Number },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
   deleted_at: { type: Date, default: null },
@@ -62,7 +62,10 @@ exports.delete = async (condition) => {
   * @param {Object} projection
 */
 exports.getByKey = async (key, projection) => {
-  Posts.findOne({ projection }, { key }, { '$ne': { deletedAt: null } });
+  Posts.findOne(key, projection)
+    .then(res => {
+      console.log(res);
+    });
 };
 
 /**
@@ -71,7 +74,10 @@ exports.getByKey = async (key, projection) => {
   * @param {Object} projection
 */
 exports.getAllPostsByUserKey = async (authorKey, projection) => {
-  Posts.find({ projection }, { authorKey }, { '$ne': { deletedAt: null } });
+  Posts.find(authorKey, projection)
+    .then(res => {
+      console.log(res);
+    });
 };
 
 /**

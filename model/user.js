@@ -6,6 +6,7 @@ mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCr
 const usersSchema = new Schema({
   key: { type: mongoose.Types.ObjectId },
   phoneNumber: { type: String },
+  userName: { type: String },
   displayName: { type: String },
   password: { type: String },
   avatarKey: { type: mongoose.Types.ObjectId },
@@ -56,25 +57,37 @@ exports.delete = async (condition) => {
   * Get user by key
   * @param {String} key
   * @param {Object} projection
+  * @returns {Promise<Object>}
 */
-exports.getUserByKey = async (key, projection) => {
-  Users.findOne({ projection }, { key }, { '$ne': { deletedAt: null } });
+exports.getByKey = async (key, projection) => {
+  Users.findOne(key, projection)
+    .then(res => {
+      console.log(res);
+    });
 };
 
 /**
   * Get user by phoneNumber
   * @param {String} phoneNumber
   * @param {Object} projection
+  * @returns {Promise<Object>}
 */
-exports.getUserByPhoneNumber = async (phoneNumber, projection) => {
-  Users.findOne({ projection }, { phoneNumber }, { '$ne': { deletedAt: null } });
+exports.getByPhoneNumber = async (phoneNumber, projection) => {
+  Users.findOne(phoneNumber, projection)
+    .then(res => {
+      console.log(res);
+    });
 };
 
 /**
  * Get user by username
  * @param {String} username
  * @param {Object} projection
- */
-exports.getUserByUserName = (username, projection) => {
-  Users.findOne({ projection }, { username }, { '$ne': { deletedAt: null } });
+ * @returns {Promise<Object>}
+*/
+exports.getByUserName = (username, projection) => {
+  Users.findOne(username, projection)
+    .then(res => {
+      console.log(res);
+    });
 };
