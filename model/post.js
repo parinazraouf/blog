@@ -4,18 +4,19 @@ const dbUrl = 'mongodb://localhost:27017/blogdb';
 mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
 const postsSchema = new Schema({
-  id: { type: Number },
-  key: { type: mongoose.Types.ObjectId },
+  id: { type: Schema.Types.ObjectId, index: true },
+  key: { type: Schema.Types.ObjectId },
   content: { type: String },
-  attachmentKey: { type: mongoose.Types.ObjectId },
-  authorKey: { type: mongoose.Types.ObjectId },
+  attachmentKey: { type: Schema.Types.ObjectId },
+  authorKey: { type: Schema.Types.ObjectId },
   likesCount: { type: Number },
   commentsCount: { type: Number },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
   deleted_at: { type: Date, default: null },
   user: [{ type: Schema.Types.ObjectId, ref: 'users' }],
-  comment: [{ type: Schema.Types.ObjectId, ref: 'comments' }]
+  comment: [{ type: Schema.Types.ObjectId, refPath: 'Comments' }],
+  counter: [{ type: Schema.Types.ObjectId, ref: 'Counters' }]
 });
 
 const Posts = mongoose.model('posts', postsSchema);
@@ -25,14 +26,38 @@ const Posts = mongoose.model('posts', postsSchema);
   * @param {Object} data     post data
 */
 exports.create = async (data) => {
-  const createPost = new Posts({ ...data });
+  // const createPost = new Posts({ ...data });
 
-  createPost.save(function (err, createPost) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('Document save done');
-    }
+  // createPost.save(function (err, createPost) {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log('Document save done');
+  //   }
+  // });
+
+  const user = new Posts({
+    _id: new mongoose.Types.ObjectId()
+  });
+
+  const comment = new Posts({
+    _id: new mongoose.Types.ObjectId()
+  });
+
+  const counter = new Posts({
+    _id: new mongoose.Types.ObjectId()
+  });
+
+  const createPost = new Posts({
+    user: user._id,
+    comment: comment._id,
+    counter: counter._id,
+    ...data
+
+  });
+
+  createPost.save(function (err) {
+    if (err) return (err);
   });
 };
 
@@ -80,11 +105,14 @@ exports.getAllPostsByUserKey = async (authorKey, projection) => {
     });
 };
 
-/**
-  * Get all liked users list by post key
-  * @param {String} key
-  * @param {Object} projection
-*/
-exports.getAllLikedUsersListSchema = async (postKey, projection) => {
-
-};
+// /**
+//   * Get all liked users list by post key
+//   * @param {String} key
+//   * @param {Object} projection
+// */
+// exports.getAllLikedUsersListSchema = async (postsId, projection) => {
+//   Posts.find({ _id: postsId, projection }).populate({ path: 'user', select: 'key phoneNumber userName displayName avatarKey' }).populate('counter')
+//     .then(res => {
+//       console.log(res);
+//     });
+// };

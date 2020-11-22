@@ -4,17 +4,18 @@ const dbUrl = 'mongodb://localhost:27017/blogdb';
 mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
 const countersSchema = new Schema({
-  id: { type: Number },
-  target_key: { type: mongoose.Types.ObjectId },
-  target_type: { type: Number },
-  counter_field: { type: String },
+  id: { type: Schema.Types.ObjectId, index: true },
+  targetKey: { type: Schema.Types.ObjectId },
+  targetType: { type: Number },
+  counterField: { type: String },
   value: { type: Number },
-  user_key: { type: mongoose.Types.ObjectId },
+  userKey: { type: Schema.Types.ObjectId },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
   deleted_at: { type: Date, default: null },
-  post: [{ type: Schema.Types.ObjectId, ref: 'posts' }],
-  comment: [{ type: Schema.Types.ObjectId, ref: 'comments' }]
+  user: [{ type: Schema.Types.ObjectId, ref: 'Users' }],
+  post: [{ type: Schema.Types.ObjectId, ref: 'Posts' }],
+  comment: [{ type: Schema.Types.ObjectId, ref: 'Comments' }]
 });
 
 const Counters = mongoose.model('counters', countersSchema);
@@ -26,14 +27,38 @@ const Counters = mongoose.model('counters', countersSchema);
  * @returns {Promise<Object>}
  */
 exports.upsert = async (data) => {
-  const createCounter = new Counters({ ...data });
+  // const createCounter = new Counters({ ...data });
 
-  createCounter.save(function (err, createCounter) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('Document save done');
-    }
+  // createCounter.save(function (err, createCounter) {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log('Document save done');
+  //   }
+  // });
+
+  const user = new Counters({
+    _id: new mongoose.Types.ObjectId()
+  });
+
+  const post = new Counters({
+    _id: new mongoose.Types.ObjectId()
+  });
+
+  const comment = new Counters({
+    _id: new mongoose.Types.ObjectId()
+  });
+
+  const createCounter = new Counters({
+    user: user._id,
+    post: post._id,
+    comment: comment._id,
+    ...data
+
+  });
+
+  createCounter.save(function (err) {
+    if (err) return (err);
   });
 };
 
