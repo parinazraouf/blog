@@ -30,10 +30,11 @@ const properties = {
     'deletedAt'
   ],
   user: [
+    'id',
     'key',
     'phoneNumber',
-    'displayName',
     'userName',
+    'displayName',
     'password',
     'avatarKey',
     'createdAt',
