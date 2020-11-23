@@ -20,54 +20,11 @@ const usersSchema = new Schema({
 
 const Users = mongoose.model('users', usersSchema);
 
-// const post = new Users({
-//   _id: new mongoose.Types.ObjectId()
-// });
-
-// const comment = new Users({
-//   _id: new mongoose.Types.ObjectId()
-// });
-
-// post.save(function (err) {
-//   if (err) return (err);
-
-//   const User1 = new Users({
-//     post: post._id // assign the _id
-//   });
-
-//   User1.save(function (err) {
-//     if (err) return (err);
-//     // that's it!
-//   });
-// });
-
-// comment.save(function (err) {
-//   if (err) return (err);
-
-//   const User2 = new Users({
-//     comment: comment._id // assign the _id
-//   });
-//   User2.save(function (err) {
-//     if (err) return (err);
-//     // that's it!
-//   });
-// });
-
 /**
   * Create new user
   * @param {Object} data     user data
 */
 exports.create = async (data) => {
-  // const createUser = new Users({ ...data });
-
-  // createUser.save(function (err, createUser) {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     console.log('Document save done');
-  //   }
-  // });
-
   const post = new Users({
     _id: new mongoose.Types.ObjectId()
   });
@@ -114,7 +71,7 @@ exports.delete = async (condition) => {
   * @param {Object} projection
   * @returns {Promise<Object>}
 */
-exports.getByKey = async (key, projection) => {
+exports.getUserByKey = async (key, projection) => {
   Users.findOne(key, projection)
     .then(res => {
       console.log(res);
@@ -127,7 +84,7 @@ exports.getByKey = async (key, projection) => {
   * @param {Object} projection
   * @returns {Promise<Object>}
 */
-exports.getByPhoneNumber = async (phoneNumber, projection) => {
+exports.getUserByPhoneNumber = async (phoneNumber, projection) => {
   Users.findOne(phoneNumber, projection)
     .then(res => {
       console.log(res);
@@ -140,7 +97,7 @@ exports.getByPhoneNumber = async (phoneNumber, projection) => {
  * @param {Object} projection
  * @returns {Promise<Object>}
 */
-exports.getByUserName = (username, projection) => {
+exports.getUserByUsername = (username, projection) => {
   Users.findOne(username, projection)
     .then(res => {
       console.log(res);

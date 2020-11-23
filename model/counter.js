@@ -23,20 +23,9 @@ const Counters = mongoose.model('counters', countersSchema);
 /**
  * Upsert counter
  * @param {Object} data
- * @param {Object} options
  * @returns {Promise<Object>}
  */
 exports.upsert = async (data) => {
-  // const createCounter = new Counters({ ...data });
-
-  // createCounter.save(function (err, createCounter) {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     console.log('Document save done');
-  //   }
-  // });
-
   const user = new Counters({
     _id: new mongoose.Types.ObjectId()
   });

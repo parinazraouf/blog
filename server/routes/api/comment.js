@@ -1,6 +1,5 @@
 require('module-alias/register');
 
-const get = require('lodash/get');
 const { httpInvariant } = require('~/lib/error');
 const { Joi } = require('~/lib/validate');
 const { counter: counterEnum } = require('~/config/enum');
@@ -104,9 +103,9 @@ module.exports = router => {
     // Check comment existence
     httpInvariant(comment, ...commentError.commentNotFound);
 
-    // Check comment's author
     const post = await postModel.getByKey(comment.postKey, ['key']);
 
+    // Check comment's author
     httpInvariant(post && comment.authorKey === userKey, ...appError.forbiddenAccess);
 
     // Delete comment
@@ -158,14 +157,13 @@ module.exports = router => {
 
   router.get('/post/comment/all/:key', async ctx => {
     const { key } = Joi.attempt(ctx.params.key, getAllPostCommentsSchema);
-    const userKey = get(ctx.state, 'user.key');
 
     const post = await postModel.getByKey(key, ['key']);
 
-    // Check if user exists or doesn't
+    // Check if post exists or doesn't
     httpInvariant(post, ...postError.postNotFound);
 
-    const res = await commentModel.getAllByPostKey(key, userKey, properties.comment);
+    const res = await commentModel.getAllByPostKey(key, properties.comment);
 
     ctx.body = res;
   });

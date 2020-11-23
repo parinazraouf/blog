@@ -1,20 +1,4 @@
 exports.app = {
-  authorizationProblem: [
-    500,
-    'there is an authorization problem',
-    {
-      code: 'authorizationProblem'
-    }
-  ],
-
-  accessDenied: [
-    403,
-    'access denied',
-    {
-      code: 'accessDenied'
-    }
-  ],
-
   forbiddenAccess: [
     403,
     'forbidden access',
@@ -31,49 +15,11 @@ exports.app = {
     }
   ],
 
-  duplicateName: [
-    422,
-    'this name has already taken',
-    {
-      code: 'duplicateName'
-    },
-    {
-      field: 'name'
-    }
-  ],
-
-  invalidName: [
-    422,
-    'name is invalid',
-    {
-      code: 'invalidName'
-    },
-    {
-      field: 'name'
-    }
-  ],
-
   invalidInput: [
     400,
     'input is invalid',
     {
       code: 'invalidInput'
-    }
-  ],
-
-  invalidVerificationCode: [
-    422,
-    'invalid verification code',
-    {
-      code: 'invalidVerificationCode'
-    }
-  ],
-
-  invalidRegistrationToken: [
-    422,
-    'invalid registration token',
-    {
-      code: 'invalidRegistrationToken'
     }
   ],
 
@@ -121,14 +67,6 @@ exports.post = {
     }
   ],
 
-  invalidPost: [
-    422,
-    'post isn\'t valid',
-    {
-      code: 'invalidPost'
-    }
-  ],
-
   postEditHasExpired: [
     403,
     'post edit has been expired',
@@ -144,16 +82,6 @@ exports.comment = {
     'comment not found',
     {
       code: 'commentNotFound'
-    }
-  ]
-};
-
-exports.contact = {
-  invalidValueContact: [
-    400,
-    'the input object is invalid',
-    {
-      code: 'invalidValueContact'
     }
   ]
 };

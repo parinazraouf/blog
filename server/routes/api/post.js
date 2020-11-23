@@ -48,11 +48,7 @@ module.exports = router => {
     content: Joi.string()
       .min(postLimit.contentLengthRange[0])
       .max(postLimit.contentLengthRange[1])
-      .trim(),
-    imageKeys: Joi.array()
-      .items(Joi.string().uuid({ version: 'uuidv4' }).required())
-      .min(1)
-      .max(postLimit.maxPostImagesCount)
+      .trim()
   });
 
   router.post('/post/create', async ctx => {
@@ -131,8 +127,7 @@ module.exports = router => {
       'key',
       'content',
       'authorKey',
-      'likesCount',
-      'attachmentKey'
+      'likesCount'
     ]);
 
     httpInvariant(post, ...postError.postNotFound);
@@ -150,37 +145,41 @@ module.exports = router => {
     ctx.bodyOk({ total });
   });
 
-  // const getAllUserPostsSchema = Joi.object().keys({
-  // });
+  const getAllUserPostsSchema = Joi.object().keys({
+    key: Joi.string().uuid({ version: 'uuidv4' }).required()
+
+  });
 
   router.get('/user/alluserposts', async ctx => {
-    const userKey = get(ctx.state, 'user.key');
+    const { key } = Joi.attempt({
+      key: ctx.params.key
+    }, getAllUserPostsSchema);
 
     // Check user existence
-    const user = await userModel.getByKey(userKey, ['key']);
+    const user = await userModel.getByKey(key, ['key']);
 
     httpInvariant(user, ...userError.userNotFound);
 
-    const res = await postModel.getAllPostsByUserKey(userKey, properties.post);
+    const res = await postModel.getAllPostsByUserKey(key, properties.post);
 
     ctx.body = res;
   });
 
-  const getAllLikedUsersListSchema = Joi.object().keys({
-    key: Joi.string().uuid({ version: 'uuidv4' }).required()
-  });
+  // const getAllLikedUsersListSchema = Joi.object().keys({
+  //   key: Joi.string().uuid({ version: 'uuidv4' }).required()
+  // });
 
-  router.get('/post/like/list/:key', async ctx => {
-    const { key } = Joi.attempt(ctx.params.key, getAllLikedUsersListSchema);
+  // router.get('/post/like/list/:key', async ctx => {
+  //   const { key } = Joi.attempt(ctx.params.key, getAllLikedUsersListSchema);
 
-    const post = await postModel.getByKey(key, ['key']);
+  //   const post = await postModel.getByKey(key, ['key']);
 
-    httpInvariant(post, ...postError.postNotFound);
+  //   httpInvariant(post, ...postError.postNotFound);
 
-    const res = await postModel.getAllLikedUsersList(key, properties.user);
+  //   const res = await postModel.getAllLikedUsersList(key, properties.user);
 
-    ctx.body = res;
-  });
+  //   ctx.body = res;
+  // });
 
   const getPostByKeySchema = Joi.object().keys({
     key: Joi.string().uuid({ version: 'uuidv4' }).required()
@@ -189,6 +188,7 @@ module.exports = router => {
   router.get('/post/key/:key', async ctx => {
     const { key } = Joi.attempt(ctx.params.key, getPostByKeySchema);
 
+    // Check post existence
     const post = await postModel.getByKey(key, ['key']);
 
     httpInvariant(post, ...postError.postNotFound);

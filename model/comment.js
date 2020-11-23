@@ -25,16 +25,6 @@ const Comments = mongoose.model('comments', commentsSchema);
   * @param {Object} data     comment data
 */
 exports.create = async (data) => {
-  // const createComment = new Comments({ ...data });
-
-  // createComment.save(function (err, createComment) {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     console.log('Document save done');
-  //   }
-  // });
-
   const post = new Comments({
     _id: new mongoose.Types.ObjectId()
   });
@@ -68,7 +58,6 @@ exports.update = async (condition, data) => {
 /**
   * Delete comment
   * @param {Object} condition
-  * @param {Object} options
 */
 exports.delete = async (condition) => {
   Comments.deleteOne(condition, function (err) {
@@ -91,7 +80,6 @@ exports.getByKey = async (key, projection) => {
 /**
  * Get all comments by post key
  * @param {String}        postKey
- * @param {String}        userKey
  * @param {Array<String>} projection
  */
 exports.getAllByPostKey = async (postKey, projection) => {
@@ -104,7 +92,6 @@ exports.getAllByPostKey = async (postKey, projection) => {
 /**
  * Get all user keys that commented on this post by post key
  * @param {String} postKey
- * @param {Object} userKey
  */
 
 exports.getAllUserKeysCommented = async (posts, projection) => {
@@ -118,27 +105,4 @@ exports.getAllUserKeysCommented = async (posts, projection) => {
 
   console.log('1111111111111111111111111', posts);
   console.log('222222222222222222222222', projection);
-
-  // return uniq(res.map(i => i.authorKey));
 };
-
-// exports.getAllUserKeysCommented = async (postKey, userKey, { ignoreUserKeys } = {}) => {
-//   const query = db(TABLE_NAME)
-//     .select('authorKey')
-//     .where({ postKey });
-
-//   if (ignoreUserKeys) {
-//     query.whereNotIn('authorKey', castArray(ignoreUserKeys));
-//   }
-
-//   const res = await query.whereNull('deletedAt');
-
-//   return uniq(res.map(i => i.authorKey));
-// };
-
-// exports.getByKey = async (key, projection) => {
-//   Users.findOne(key, projection)
-//     .then(res => {
-//       console.log(res);
-//     });
-// };

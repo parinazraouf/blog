@@ -41,7 +41,8 @@ module.exports = router => {
       phoneNumber: data.phoneNumber,
       displayName: data.displayName,
       userName: data.userName,
-      password: data.password
+      password: data.password,
+      avatarKey: data.avatarKey
     });
 
     ctx.bodyOk(user);
@@ -62,15 +63,16 @@ module.exports = router => {
       'key',
       'phoneNumber',
       'displayName',
-      'username',
-      'password'
+      'username'
     ]);
 
+    // Check user existence
     httpInvariant(user, ...userError.userNotFound);
 
     if (data.username) {
       const isExist = await userModel.getUserByUsername(data.username, ['key']);
 
+      // Check username existence
       httpInvariant(!isExist, ...userError.usernameAlreadyTaken);
     }
 
@@ -102,11 +104,8 @@ module.exports = router => {
 
   router.get('/user/key/:key', async ctx => {
     const { key } = Joi.attempt(ctx.params, getUserByKeySchema);
-    const userKey = ctx.state.user.key;
 
-    const user = await userModel.getUserByKey(key, properties.user, {
-      viewerUserKey: userKey
-    });
+    const user = await userModel.getUserByKey(key, properties.user);
 
     httpInvariant(user, ...userError.userNotFound);
 
@@ -146,7 +145,7 @@ module.exports = router => {
   });
 
   // Check username existence
-  // This api will return `false` if username doesn't exist and `true` if username is aleady exist
+  // This api returns `false` if username doesn't exist and `true` if username aleady exists
   router.get('/user/username/:username/check', async ctx => {
     const { username } = Joi.attempt(ctx.params, checkUsernameExistenceSchema);
 

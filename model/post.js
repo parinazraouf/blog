@@ -26,16 +26,6 @@ const Posts = mongoose.model('posts', postsSchema);
   * @param {Object} data     post data
 */
 exports.create = async (data) => {
-  // const createPost = new Posts({ ...data });
-
-  // createPost.save(function (err, createPost) {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     console.log('Document save done');
-  //   }
-  // });
-
   const user = new Posts({
     _id: new mongoose.Types.ObjectId()
   });
