@@ -150,7 +150,7 @@ module.exports = router => {
 
   });
 
-  router.get('/user/alluserposts', async ctx => {
+  router.get('/user/alluserposts/:key', async ctx => {
     const { key } = Joi.attempt({
       key: ctx.params.key
     }, getAllUserPostsSchema);

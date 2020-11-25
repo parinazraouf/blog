@@ -85,7 +85,7 @@ module.exports = router => {
     key: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
-  router.delete('/user/delete', async ctx => {
+  router.delete('/user/delete/:key', async ctx => {
     const { key } = Joi.attempt(ctx.params, deleteUserSchema);
 
     // Check user existence

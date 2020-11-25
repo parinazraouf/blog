@@ -57,8 +57,8 @@ exports.upsert = async (data) => {
  * @param {Number} targetType
  * @param {String} counterField
 */
-exports.getByTarget = async (targetKey, targetType, counterField) => {
-  Counters.find(targetKey, targetType, counterField)
+exports.getByTarget = async (targetKey, projection) => {
+  Counters.find(targetKey, projection)
     .then(res => {
       console.log(res);
     });

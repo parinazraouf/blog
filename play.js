@@ -5,11 +5,11 @@
 // // const testModelCreatePost = require('~/model/post');
 
 // const res = testModelCreateUser.create({
-//   // key: '53cb6b9b4f4ddef1ad47f404',
-//   phoneNumber: '989127777777',
-//   userName: 'userNumber7',
-//   displayName: 'user 7',
-//   password: '7777'
+//   key: '53cb6b9b4f4ddef1ad47f404',
+//   phoneNumber: '989129999999',
+//   userName: 'userNumber9',
+//   displayName: 'user 9',
+//   password: '9999'
 // });
 
 // console.log('/...................', res);
@@ -43,7 +43,7 @@
 // console.log('//////////////////////////', res1);
 
 // const res = testModelCreatePost.getAllPostsByUserKey(
-//   { authorKey: '53cb6b9b4f4ddef1ad47f101' },
+//   { authorKey: '5fb24e67884ea877fceb11c4' },
 //   '_id key content authorKey attachmentKey likesCount commentsCount created_at updated_at '
 // );
 
@@ -68,7 +68,7 @@
 // const testModelCreateComment = require('~/model/comment');
 
 // const res = testModelCreateComment.create({
-//   key: '53cb6b9b4f4ddef1ad47f404',
+//   key: '53cb6b9b4f4ddef1ad47f402',
 //   content: 'comment 2',
 //   attachmentKey: '53cb6b9b4f4ddef1ad47c777',
 //   authorKey: '5fb24e67884ea877fceb11c4',
@@ -78,18 +78,18 @@
 
 // console.log('/...................', res);
 
-require('module-alias/register');
-const mongoose = require('mongoose');
+// require('module-alias/register');
+// const mongoose = require('mongoose');
 
-const testModelCreateComment = require('~/model/comment');
+// const testModelCreateComment = require('~/model/comment');
 
-const res = testModelCreateComment.getAllUserKeysCommented(
-  { posts: '5fb516cb4f3a2f9b00e36545' },
-  ' authorKey '
+// const res = testModelCreateComment.getAllUserKeysCommented(
+//   { posts: '5fb516cb4f3a2f9b00e36545' },
+//   ' authorKey '
 
-);
+// );
 
-console.log('/...................', res);
+// console.log('/...................', res);
 
 // require('module-alias/register');
 // const mongoose = require('mongoose');
@@ -100,6 +100,22 @@ console.log('/...................', res);
 //   { postsId: '5fb50f95ded9d0907e6d6da3' },
 //   'key '
 
+// );
+
+// console.log('/...................', res);
+
+// require('module-alias/register');
+// const mongoose = require('mongoose');
+
+// const testModelGetCounter = require('~/model/counter');
+
+// const res = testModelGetCounter.upsert(
+//   { targetKey: '1fb50f95ded9d0907e6d6da1',
+//     targetType: 1,
+//     counterField: 'likesCount',
+//     value: 2,
+//     userKey: '53cb6b9b4f4ddef1ad47f404'
+//   }
 // );
 
 // console.log('/...................', res);

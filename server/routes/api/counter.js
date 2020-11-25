@@ -34,19 +34,15 @@ module.exports = router => {
   });
 
   const getCountersByTargetKeySchema = Joi.object().keys({
-    targetKey: Joi.string().uuid({ version: 'uuidv4' }).required(),
-    targetType: Joi.number().valid(Object.values(counterEnum.targetType)).required(),
-    counterField: Joi.string()
+    targetKey: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
-  router.get('/counter/target/:targetKey/type/:targetType/counterField/:counterField', async ctx => {
+  router.get('/counter/target/:targetKey', async ctx => {
     const {
-      targetKey,
-      targetType,
-      counterField
+      targetKey
     } = Joi.attempt(ctx.params, getCountersByTargetKeySchema);
 
-    const res = await counterModel.getByTarget(targetKey, targetType, counterField);
+    const res = await counterModel.getByTarget(targetKey, properties.counter);
 
     ctx.bodyOk(res);
   });
