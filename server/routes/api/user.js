@@ -74,6 +74,7 @@ module.exports = router => {
       httpInvariant(!isExist, ...userError.usernameAlreadyTaken);
     }
 
+    // Edit user
     const updatedUser = await userModel.update({ _id: db.ObjectID(_id) }, data);
 
     ctx.body = !!updatedUser;
@@ -91,6 +92,7 @@ module.exports = router => {
 
     httpInvariant(user, ...userError.userNotFound);
 
+    // Delete user
     const res = await userModel.delete({ _id: db.ObjectID(_id) });
 
     ctx.body = !res;
@@ -103,6 +105,7 @@ module.exports = router => {
   router.get('/user/id/:id', async ctx => {
     const { id } = Joi.attempt({ id: ctx.params.id }, getUserByIdSchema);
 
+    // Check user existence
     const user = await userModel.getUserById(id, properties.user);
 
     httpInvariant(user, ...userError.userNotFound);
@@ -117,6 +120,7 @@ module.exports = router => {
   router.get('/user/key/:key', async ctx => {
     const { key } = Joi.attempt({ key: ctx.params.key }, getUserByKeySchema);
 
+    // Check user existence
     const user = await userModel.getUserByKey(key, properties.user);
 
     httpInvariant(user, ...userError.userNotFound);
@@ -131,6 +135,7 @@ module.exports = router => {
   router.get('/user/username/:userName', async ctx => {
     const { userName } = Joi.attempt({ userName: ctx.params.userName }, getUserByUserNameSchema);
 
+    // Check user existence
     const user = await userModel.getUserByUserName({ userName }, properties.user);
 
     httpInvariant(user, ...userError.userNotFound);
@@ -145,6 +150,7 @@ module.exports = router => {
   router.get('/user/phonenumber/:phoneNumber', async ctx => {
     const { phoneNumber } = Joi.attempt({ phoneNumber: ctx.params.phoneNumber }, getUserByPhoneNumberSchema);
 
+    // Check user existence
     const user = await userModel.getUserByPhoneNumber({ phoneNumber }, properties.user);
 
     httpInvariant(user, ...userError.userNotFound);

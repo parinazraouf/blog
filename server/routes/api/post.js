@@ -3,11 +3,9 @@ require('module-alias/register');
 const db = require('~/lib/db');
 const { httpInvariant } = require('~/lib/error');
 const { Joi } = require('~/lib/validate');
-// const { counter: counterEnum } = require('~/config/enum');
 const { post: postLimit } = require('~/config/limit');
 const postModel = require('~/model/post');
 const userModel = require('~/model/user');
-// const counterModel = require('~/model/counter');
 
 const {
   app: appError,
@@ -95,10 +93,13 @@ module.exports = router => {
       'createdAt'
     ]);
 
+    // Check post existence
     httpInvariant(post, ...postError.postNotFound);
 
+    // Check post's author
     httpInvariant(post.authorId === userId, ...appError.permissionDenied);
 
+    // Edit post
     const res = await postModel.update({ _id: db.ObjectID(_id) }, { content: data.content, category: data.category });
 
     ctx.body = !!res;
@@ -117,8 +118,10 @@ module.exports = router => {
 
     httpInvariant(post, ...postError.postNotFound);
 
+    // Check post's author
     httpInvariant(userId === post.authorId, ...appError.permissionDenied);
 
+    // Delete post
     const res = await postModel.delete({ _id: db.ObjectID(_id) });
 
     ctx.body = !res;

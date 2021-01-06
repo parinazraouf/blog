@@ -3,11 +3,9 @@ require('module-alias/register');
 const db = require('~/lib/db');
 const { httpInvariant } = require('~/lib/error');
 const { Joi } = require('~/lib/validate');
-// const { counter: counterEnum } = require('~/config/enum');
 const { comment: commentLimit } = require('~/config/limit');
 const commentModel = require('~/model/comment');
 const postModel = require('~/model/post');
-// const counterModel = require('~/model/counter');
 
 const {
   app: appError,
@@ -111,7 +109,7 @@ module.exports = router => {
   router.get('/comment/id/:id', async ctx => {
     const { id } = Joi.attempt({ id: ctx.params.id }, getCommentByIdSchema);
 
-    // Check post existence
+    // Check comment existence
     const comment = await commentModel.getCommentById(id, ['id']);
 
     httpInvariant(comment, ...commentError.commentNotFound);
@@ -128,7 +126,7 @@ module.exports = router => {
   router.get('/comment/key/:key', async ctx => {
     const { key } = Joi.attempt({ key: ctx.params.key }, getCommentByKeySchema);
 
-    // Check post existence
+    // Check comment existence
     const comment = await commentModel.getCommentByKey(key, ['key']);
 
     httpInvariant(comment, ...commentError.commentNotFound);
