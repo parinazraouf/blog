@@ -1,14 +1,13 @@
 require('module-alias/register');
 
-const get = require('lodash/get');
+const db = require('~/lib/db');
 const { httpInvariant } = require('~/lib/error');
 const { Joi } = require('~/lib/validate');
-const { counter: counterEnum } = require('~/config/enum');
-const ms = require('ms');
+// const { counter: counterEnum } = require('~/config/enum');
 const { post: postLimit } = require('~/config/limit');
 const postModel = require('~/model/post');
 const userModel = require('~/model/user');
-const counterModel = require('~/model/counter');
+// const counterModel = require('~/model/counter');
 
 const {
   app: appError,
@@ -18,11 +17,12 @@ const {
 
 const properties = {
   post: [
-    'id',
+    '_id',
     'key',
     'content',
+    'category',
     'attachmentKey',
-    'authorKey',
+    'authorId',
     'likesCount',
     'commentsCount',
     'createdAt',
@@ -30,171 +30,170 @@ const properties = {
     'deletedAt'
   ],
   user: [
-    'id',
-    'key',
+    '_id',
     'phoneNumber',
     'userName',
-    'displayName',
-    'password',
-    'avatarKey',
-    'createdAt',
-    'updatedAt',
-    'deletedAt'
+    'displayName'
   ]
 };
 
 module.exports = router => {
   const createPostSchema = Joi.object().keys({
-    content: Joi.string()
-      .min(postLimit.contentLengthRange[0])
-      .max(postLimit.contentLengthRange[1])
-      .trim()
+    userId: Joi.string().required(),
+    data: Joi.object().keys({
+      content: Joi.string()
+        .min(postLimit.contentLengthRange[0])
+        .max(postLimit.contentLengthRange[1])
+        .required()
+        .trim(),
+      category: Joi.string()
+        .min(postLimit.categoryLengthRange[0])
+        .max(postLimit.categoryLengthRange[1])
+        .required()
+        .trim(),
+      likesCount: Joi.number()
+    })
   });
 
-  router.post('/post/create', async ctx => {
-    const data = Joi.attempt(ctx.request.body, createPostSchema);
-    const userKey = ctx.state.user.key;
+  router.post('/post/create/:userId', async ctx => {
+    const { userId, data } = Joi.attempt({ data: ctx.request.body, userId: ctx.params.userId }, createPostSchema);
 
-    const [newPost] = await postModel.create({
-      ...data,
-      authorKey: userKey
+    const newPost = await postModel.create({
+      authorId: userId,
+      content: data.content,
+      category: data.category,
+      likesCount: data.likesCount
     });
 
-    ctx.bodyOk(!!newPost);
+    ctx.body = newPost.ops;
   });
 
   const editPostSchema = Joi.object().keys({
-    key: Joi.string().uuid({ version: 'uuidv4' }).required(),
-    content: Joi.string()
-      .min(postLimit.contentLengthRange[0])
-      .max(postLimit.contentLengthRange[1])
-      .trim()
+    _id: Joi.string().required(),
+    userId: Joi.string().required(),
+    data: Joi.object().keys({
+      content: Joi.string()
+        .min(postLimit.contentLengthRange[0])
+        .max(postLimit.contentLengthRange[1])
+        .trim(),
+      category: Joi.string()
+        .min(postLimit.categoryLengthRange[0])
+        .max(postLimit.categoryLengthRange[1])
+        .trim()
+    })
   });
 
-  router.put('/post/edit/:key', async ctx => {
-    const { key, content } = Joi.attempt({
-      ...ctx.request.body,
-      key: ctx.params.key
+  router.put('/post/:_id/:userId', async ctx => {
+    const { _id, userId, data } = Joi.attempt({
+      _id: ctx.params._id,
+      userId: ctx.params.userId,
+      data: ctx.request.body
     }, editPostSchema);
-    const userKey = get(ctx.state, 'user.key');
 
-    const post = await postModel.getByKey(key, [
-      'authorKey',
+    const post = await postModel.getPostById(_id, [
+      'authorId',
       'createdAt'
     ]);
 
     httpInvariant(post, ...postError.postNotFound);
 
-    httpInvariant(userKey === post.authorKey, ...appError.permissionDenied);
+    httpInvariant(post.authorId === userId, ...appError.permissionDenied);
 
-    httpInvariant(post.createdAt.getTime() + ms(postLimit.maxTimeToEdit) >= Date.now(), ...appError.permissionDenied);
+    const res = await postModel.update({ _id: db.ObjectID(_id) }, { content: data.content, category: data.category });
 
-    const [res] = await postModel.update({ key }, { content });
-
-    ctx.bodyOk(!!res);
+    ctx.body = !!res;
   });
 
   const deletePostSchema = Joi.object().keys({
-    key: Joi.string().uuid({ version: 'uuidv4' }).required()
+    _id: Joi.string().required(),
+    userId: Joi.string().required()
   });
 
-  router.delete('/post/delete/:key', async ctx => {
-    const { key } = Joi.attempt(ctx.params, deletePostSchema);
-    const userKey = ctx.state.user.key;
-
-    // Chech post existence
-    const post = await postModel.getByKey(key, ['key', 'authorKey']);
-
-    httpInvariant(post, ...postError.postNotFound);
-
-    httpInvariant(userKey === post.authorKey, ...appError.permissionDenied);
-
-    const [res] = await postModel.delete({ key });
-
-    ctx.bodyOk(!!res);
-  });
-
-  const likePostSchema = Joi.object().keys({
-    key: Joi.string().uuid({ version: 'uuidv4' }).required()
-  });
-
-  router.put('/post/like/:key', async ctx => {
-    const { key } = Joi.attempt(ctx.params, likePostSchema);
-    const userKey = ctx.state.user.key;
+  router.delete('/post/:_id/:userId', async ctx => {
+    const { _id, userId } = Joi.attempt({ _id: ctx.params._id, userId: ctx.params.userId }, deletePostSchema);
 
     // Check post existence
-    const post = await postModel.getByKey(key, [
-      'key',
-      'content',
-      'authorKey',
-      'likesCount'
-    ]);
+    const post = await postModel.getPostById(_id, ['_id', 'authorId']);
 
     httpInvariant(post, ...postError.postNotFound);
 
-    const { body: { data: res } } = await counterModel.upsert({
-      targetKey: key,
-      targetType: counterEnum.targetType.post,
-      counterField: 'likesCount',
-      userKey
-    });
+    httpInvariant(userId === post.authorId, ...appError.permissionDenied);
 
-    // Total count
-    const total = res.value ? +post.likesCount + 1 : +post.likesCount - 1;
+    const res = await postModel.delete({ _id: db.ObjectID(_id) });
 
-    ctx.bodyOk({ total });
+    ctx.body = !res;
   });
 
-  const getAllUserPostsSchema = Joi.object().keys({
-    key: Joi.string().uuid({ version: 'uuidv4' }).required()
-
+  const getPostByIdSchema = Joi.object().keys({
+    id: Joi.string().required()
   });
 
-  router.get('/user/alluserposts/:key', async ctx => {
-    const { key } = Joi.attempt({
-      key: ctx.params.key
-    }, getAllUserPostsSchema);
+  router.get('/post/id/:id', async ctx => {
+    const { id } = Joi.attempt({ id: ctx.params.id }, getPostByIdSchema);
 
-    // Check user existence
-    const user = await userModel.getByKey(key, ['key']);
+    // Check post existence
+    const post = await postModel.getPostById(id, ['_id']);
 
-    httpInvariant(user, ...userError.userNotFound);
+    httpInvariant(post, ...postError.postNotFound);
 
-    const res = await postModel.getAllPostsByUserKey(key, properties.post);
+    const res = await postModel.getPostById(id, properties.post);
 
     ctx.body = res;
   });
-
-  // const getAllLikedUsersListSchema = Joi.object().keys({
-  //   key: Joi.string().uuid({ version: 'uuidv4' }).required()
-  // });
-
-  // router.get('/post/like/list/:key', async ctx => {
-  //   const { key } = Joi.attempt(ctx.params.key, getAllLikedUsersListSchema);
-
-  //   const post = await postModel.getByKey(key, ['key']);
-
-  //   httpInvariant(post, ...postError.postNotFound);
-
-  //   const res = await postModel.getAllLikedUsersList(key, properties.user);
-
-  //   ctx.body = res;
-  // });
 
   const getPostByKeySchema = Joi.object().keys({
     key: Joi.string().uuid({ version: 'uuidv4' }).required()
   });
 
   router.get('/post/key/:key', async ctx => {
-    const { key } = Joi.attempt(ctx.params.key, getPostByKeySchema);
+    const { key } = Joi.attempt({ key: ctx.params.key }, getPostByKeySchema);
 
     // Check post existence
-    const post = await postModel.getByKey(key, ['key']);
+    const post = await postModel.getPostByKey(key, ['key']);
 
     httpInvariant(post, ...postError.postNotFound);
 
-    const res = await postModel.getByKey(key, properties.post);
+    const res = await postModel.getPostByKey(key, properties.post);
 
     ctx.body = res;
+  });
+
+  const getAllPostsByAuthorIdSchema = Joi.object().keys({
+    authorId: Joi.string().required()
+  });
+
+  router.get('/post/alluserposts/:authorId', async ctx => {
+    const { authorId } = Joi.attempt({ authorId: ctx.params.authorId }, getAllPostsByAuthorIdSchema);
+
+    // Check user existence
+    const user = await userModel.getUserById(authorId, properties.user);
+
+    httpInvariant(user, ...userError.userNotFound);
+
+    const res = await postModel.getAllPostsByAuthorId({ authorId }, properties.post);
+
+    ctx.body = res;
+  });
+
+  const getAllPostsByCategorySchema = Joi.object().keys({
+    category: Joi.string()
+      .min(postLimit.categoryLengthRange[0])
+      .max(postLimit.categoryLengthRange[1])
+      .required()
+      .trim()
+  });
+
+  router.get('/post/category/:category', async ctx => {
+    const { category } = Joi.attempt({ category: ctx.params.category }, getAllPostsByCategorySchema);
+
+    const post = await postModel.getAllPostsByCategory({ category }, properties.post);
+
+    ctx.body = post;
+  });
+
+  router.get('/post/all', async ctx => {
+    const post = await postModel.getAllPosts(properties.post);
+
+    ctx.body = post;
   });
 };

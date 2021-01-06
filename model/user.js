@@ -1,48 +1,17 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const dbUrl = 'mongodb://localhost:27017/blogdb';
-mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false });
+require('module-alias/register');
+const db = require('~/lib/db');
 
-const usersSchema = new Schema({
-  id: { type: Schema.Types.ObjectId, index: true },
-  key: { type: Schema.Types.ObjectId },
-  phoneNumber: { type: String },
-  userName: { type: String },
-  displayName: { type: String },
-  password: { type: String },
-  avatarKey: { type: Schema.Types.ObjectId },
-  created_at: { type: Date, default: Date.now },
-  updated_at: { type: Date, default: Date.now },
-  deleted_at: { type: Date, default: null },
-  post: [{ type: Schema.Types.ObjectId, ref: 'Posts' }],
-  comment: [{ type: Schema.Types.ObjectId, ref: 'Comments' }]
-});
-
-const Users = mongoose.model('users', usersSchema);
+const MODEL_NAME = 'users';
 
 /**
   * Create new user
-  * @param {Object} data     user data
+  * @param {Object} data User data
+  * @returns {Promise<Object>}
 */
-exports.create = async (data) => {
-  const post = new Users({
-    _id: new mongoose.Types.ObjectId()
-  });
+exports.create = async data => {
+  const collection = await db.collection(MODEL_NAME);
 
-  const comment = new Users({
-    _id: new mongoose.Types.ObjectId()
-  });
-
-  const createUser = new Users({
-    post: post._id,
-    comment: comment._id,
-    ...data
-
-  });
-
-  createUser.save(function (err) {
-    if (err) return (err);
-  });
+  return collection.insertOne(data);
 };
 
 /**
@@ -51,8 +20,9 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  Users.findOne({ condition })
-    .then(query => Users.updateOne({ ...data, updatedAt: Date.now() }));
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.updateOne(condition, { $set: data });
 };
 
 /**
@@ -60,46 +30,65 @@ exports.update = async (condition, data) => {
   * @param {Object} condition
 */
 exports.delete = async (condition) => {
-  Users.deleteOne(condition, function (err) {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.deleteOne(condition, function (err) {
     if (err) console.log(err);
   });
 };
 
 /**
-  * Get user by key
-  * @param {String} key
-  * @param {Object} projection
+  * Get user by id
+  * @param {String} id User id
+  * @param {Array}  fields User fields
   * @returns {Promise<Object>}
 */
-exports.getUserByKey = async (key, projection) => {
-  Users.findOne(key, projection)
-    .then(res => {
-      console.log(res);
-    });
+exports.getUserById = async (id, fields) => {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.find({ _id: db.ObjectID(id) })
+    .project(db.fieldProjector(fields))
+    .next();
+};
+
+/**
+  * Get user by key
+  * @param {Object} key
+  * @param {Array}  fields User fields
+  * @returns {Promise<Object>}
+*/
+exports.getUserByKey = async (key, fields) => {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.find(key)
+    .project(db.fieldProjector(fields))
+    .next();
 };
 
 /**
   * Get user by phoneNumber
-  * @param {String} phoneNumber
-  * @param {Object} projection
+  * @param {Object} phoneNumber
+  * @param {Array}  fields User fields
   * @returns {Promise<Object>}
 */
-exports.getUserByPhoneNumber = async (phoneNumber, projection) => {
-  Users.findOne(phoneNumber, projection)
-    .then(res => {
-      console.log(res);
-    });
+exports.getUserByPhoneNumber = async (phoneNumber, fields) => {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.find(phoneNumber)
+    .project(db.fieldProjector(fields))
+    .next();
 };
 
 /**
- * Get user by username
- * @param {String} username
- * @param {Object} projection
- * @returns {Promise<Object>}
+  * Get user by userName
+  * @param {Object} userName
+  * @param {Array}  fields User fields
+  * @returns {Promise<Object>}
 */
-exports.getUserByUsername = (username, projection) => {
-  Users.findOne(username, projection)
-    .then(res => {
-      console.log(res);
-    });
+exports.getUserByUserName = async (userName, fields) => {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.find(userName)
+    .project(db.fieldProjector(fields))
+    .next();
 };

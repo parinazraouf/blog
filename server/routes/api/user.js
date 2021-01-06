@@ -1,5 +1,6 @@
 require('module-alias/register');
 
+const db = require('~/lib/db');
 const { httpInvariant } = require('~/lib/error');
 const { Joi } = require('~/lib/validate');
 const { user: userLimit } = require('~/config/limit');
@@ -37,7 +38,7 @@ module.exports = router => {
     const data = Joi.attempt(ctx.request.body, createUserSchema);
 
     // Insert `user` record
-    const [user] = await userModel.create({
+    const user = await userModel.create({
       phoneNumber: data.phoneNumber,
       displayName: data.displayName,
       userName: data.userName,
@@ -45,57 +46,68 @@ module.exports = router => {
       avatarKey: data.avatarKey
     });
 
-    ctx.bodyOk(user);
+    ctx.body = !!user;
   });
 
   const editUserSchema = Joi.object().keys({
-    phoneNumber: Joi.phoneNumber().irMobile().required(),
-    displayName: Joi.string().min(userLimit.displayNameLengthRange[0]).max(userLimit.displayNameLengthRange[1]).trim(),
-    username: Joi.name().username(),
-    password: Joi.string().min(appLimit.passwordLengthRange[0]).max(appLimit.passwordLengthRange[1])
+    _id: Joi.string().required(),
+    data: Joi.object().keys({
+      phoneNumber: Joi.phoneNumber().irMobile(),
+      displayName: Joi.string().min(userLimit.displayNameLengthRange[0]).max(userLimit.displayNameLengthRange[1]).trim(),
+      userName: Joi.name().username(),
+      password: Joi.string().min(appLimit.passwordLengthRange[0]).max(appLimit.passwordLengthRange[1])
+    })
   });
 
-  router.put('/user/edit', async ctx => {
-    const data = Joi.attempt(ctx.request.body, editUserSchema);
-    const userKey = ctx.state.user.key;
+  router.put('/user/:_id', async ctx => {
+    const { _id, data } = Joi.attempt({ data: ctx.request.body, _id: ctx.params._id }, editUserSchema);
 
-    const user = await userModel.getUserByKey(userKey, [
-      'key',
-      'phoneNumber',
-      'displayName',
-      'username'
-    ]);
+    const user = await userModel.getUserById(_id, properties.user);
 
     // Check user existence
     httpInvariant(user, ...userError.userNotFound);
 
-    if (data.username) {
-      const isExist = await userModel.getUserByUsername(data.username, ['key']);
+    if (data.userName) {
+      const isExist = await userModel.getUserByUserName({ userName: data.userName }, ['userName']);
 
       // Check username existence
       httpInvariant(!isExist, ...userError.usernameAlreadyTaken);
     }
 
-    const [updatedUser] = await userModel.update({ key: userKey }, data);
+    const updatedUser = await userModel.update({ _id: db.ObjectID(_id) }, data);
 
-    ctx.bodyOk(updatedUser);
+    ctx.body = !!updatedUser;
   });
 
   const deleteUserSchema = Joi.object().keys({
-    key: Joi.string().uuid({ version: 'uuidv4' }).required()
+    _id: Joi.string().required()
   });
 
-  router.delete('/user/delete/:key', async ctx => {
-    const { key } = Joi.attempt(ctx.params, deleteUserSchema);
+  router.delete('/user/:_id', async ctx => {
+    const { _id } = Joi.attempt({ _id: ctx.params._id }, deleteUserSchema);
 
     // Check user existence
-    const user = await userModel.getUserByKey(key, ['key']);
+    const user = await userModel.getUserById(_id, properties.user);
 
     httpInvariant(user, ...userError.userNotFound);
 
-    const [res] = await userModel.delete({ key });
+    const res = await userModel.delete({ _id: db.ObjectID(_id) });
 
-    ctx.bodyOk(!!res);
+    ctx.body = !res;
+  });
+
+  const getUserByIdSchema = Joi.object().keys({
+    id: Joi.string().required()
+  });
+
+  router.get('/user/id/:id', async ctx => {
+    const { id } = Joi.attempt({ id: ctx.params.id }, getUserByIdSchema);
+
+    const user = await userModel.getUserById(id, properties.user);
+
+    httpInvariant(user, ...userError.userNotFound);
+
+    ctx.body = user;
   });
 
   const getUserByKeySchema = Joi.object().keys({
@@ -103,55 +115,55 @@ module.exports = router => {
   });
 
   router.get('/user/key/:key', async ctx => {
-    const { key } = Joi.attempt(ctx.params, getUserByKeySchema);
+    const { key } = Joi.attempt({ key: ctx.params.key }, getUserByKeySchema);
 
     const user = await userModel.getUserByKey(key, properties.user);
 
     httpInvariant(user, ...userError.userNotFound);
 
-    ctx.bodyOk(user);
+    ctx.body = user;
   });
 
-  const getUserByUsernameSchema = Joi.object().keys({
-    userName: Joi.string().uuid({ version: 'uuidv4' }).required()
+  const getUserByUserNameSchema = Joi.object().keys({
+    userName: Joi.name().username().required()
   });
 
-  router.get('/user/username/:username', async ctx => {
-    const { userName } = Joi.attempt(ctx.params, getUserByUsernameSchema);
+  router.get('/user/username/:userName', async ctx => {
+    const { userName } = Joi.attempt({ userName: ctx.params.userName }, getUserByUserNameSchema);
 
-    const user = await userModel.getUserByUserName(userName, ['key', 'username']);
+    const user = await userModel.getUserByUserName({ userName }, properties.user);
 
     httpInvariant(user, ...userError.userNotFound);
 
-    ctx.bodyOk(user);
+    ctx.body = user;
   });
 
-  const getUserByPhonenumberSchema = Joi.object().keys({
+  const getUserByPhoneNumberSchema = Joi.object().keys({
     phoneNumber: Joi.phoneNumber().irMobile().required()
   });
 
-  router.get('/user/phonenumber/:phonenumber', async ctx => {
-    const { phoneNumber } = Joi.attempt(ctx.params, getUserByPhonenumberSchema);
+  router.get('/user/phonenumber/:phoneNumber', async ctx => {
+    const { phoneNumber } = Joi.attempt({ phoneNumber: ctx.params.phoneNumber }, getUserByPhoneNumberSchema);
 
-    const user = await userModel.getUserByPhoneNumber(phoneNumber, ['key', 'phonenumber']);
+    const user = await userModel.getUserByPhoneNumber({ phoneNumber }, properties.user);
 
     httpInvariant(user, ...userError.userNotFound);
 
-    ctx.bodyOk(user);
+    ctx.body = user;
   });
 
-  const checkUsernameExistenceSchema = Joi.object().keys({
-    username: Joi.name().username().required()
+  const checkUserNameExistenceSchema = Joi.object().keys({
+    userName: Joi.name().username().required()
   });
 
   // Check username existence
   // This api returns `false` if username doesn't exist and `true` if username aleady exists
-  router.get('/user/username/:username/check', async ctx => {
-    const { username } = Joi.attempt(ctx.params, checkUsernameExistenceSchema);
+  router.get('/user/username/:userName/check', async ctx => {
+    const { userName } = Joi.attempt({ userName: ctx.params.userName }, checkUserNameExistenceSchema);
 
     // Check username existence
-    const user = await userModel.getByUsername(username, ['key', 'username']);
+    const user = await userModel.getUserByUserName({ userName }, ['key', 'userName']);
 
-    ctx.bodyOk(!!user);
+    ctx.body = !!user;
   });
 };

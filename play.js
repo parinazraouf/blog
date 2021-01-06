@@ -1,69 +1,143 @@
-// require('module-alias/register');
 // const mongoose = require('mongoose');
+// const testModelCreatePost = require('~/model/post');
+
+// require('module-alias/register');
 
 // const testModelCreateUser = require('~/model/user');
-// // const testModelCreatePost = require('~/model/post');
 
 // const res = testModelCreateUser.create({
-//   key: '53cb6b9b4f4ddef1ad47f404',
-//   phoneNumber: '989129999999',
-//   userName: 'userNumber9',
-//   displayName: 'user 9',
-//   password: '9999'
+//   key: '53cb6b9b4f4ddef1ad47f222',
+//   phoneNumber: '989122222222',
+//   userName: 'userNumber2',
+//   displayName: 'user 2',
+//   password: '2222'
 // });
 
 // console.log('/...................', res);
 
+require('module-alias/register');
+
+const testModelCreateUser = require('~/model/user');
+
+const res = testModelCreateUser.update(
+  { userName: 'userNumber9' },
+  {
+    phoneNumber: '989121212122',
+    userName: 'num12',
+    password: '1212'
+  });
+
+console.log('/...................', res);
+
 // require('module-alias/register');
-// const mongoose = require('mongoose');
 
 // const testModelCreateUser = require('~/model/user');
 
-// const res = testModelCreateUser.update(
-//   { key: '53cb6b9b4f4ddef1ad47f560' },
+// const res = testModelCreateUser.delete(
+//   { id: '5fec63fe7c41b004378c92e2' });
+
+// console.log('/...................', res);
+
+// require('module-alias/register');
+
+// const testModelCreateUser = require('~/model/user');
+
+// const res1 = testModelCreateUser.getUserById(
+//   '5fd5ae1894a01619ee883515',
+//   [' key', 'phoneNumber', 'userName ']
+// );
+// console.log('.............................', res1);
+
+// require('module-alias/register');
+
+// const testModelCreateUser = require('~/model/user');
+
+// const res1 = testModelCreateUser.getUserByKey(
+//     { key: '53cb6b9b4f4ddef1ad47f111' },
+//     ['_id', 'key', 'phoneNumber', 'userName', 'displayName']
+// );
+// console.log('.............................', res1);
+
+// require('module-alias/register');
+
+// const testModelCreateUser = require('~/model/user');
+
+// const res1 = testModelCreateUser.getUserByPhoneNumber(
+//   { phoneNumber: '989121111111' },
+//   ['_id', 'key', 'userName', 'displayName']
+// );
+
+// console.log('.............................', res1);
+
+// require('module-alias/register');
+
+// const testModelCreateUser = require('~/model/user');
+
+// const res1 = testModelCreateUser.getUserByUsername(
+//   { userName: 'userNumber3' },
+//   ['_id', 'key', 'phoneNumber', 'displayName']
+// );
+
+// console.log('.............................', res1);
+
+// require('module-alias/register');
+
+// const testModelCreatePost = require('~/model/post');
+// const res = testModelCreatePost.create(
 //   {
-//     phoneNumber: '989123333444',
-//     displayName: 'mahhhhhhhmoooooddddddddd',
-//     password: '0000'
-//   });
+//     key: '53cb6b9b4f4ddef1ad47c3',
+//     content: 'hello 3',
+//     authorKey: '53cb6b9b4f4ddef1ad47f222',
+//     likesCount: 200,
+//     commentsCount: 20,
+//     category: 'category 2'
+//   }
+// );
 
 // console.log('/...................', res);
-// console.log(mongoose.Types.ObjectId.isValid('53cb6b9b4f4ddef1ad47f943'));
 
 // require('module-alias/register');
 
-// const testModelCreateUser = require('~/model/user');
 // const testModelCreatePost = require('~/model/post');
-
-// const res1 = testModelCreateUser.getByKey(
-//   { key: '53cb6b9b4f4ddef1ad47f404' },
-//   '_id key phoneNumber userName displayName created_at updated_at'
-// );
-
-// console.log('//////////////////////////', res1);
-
 // const res = testModelCreatePost.getAllPostsByUserKey(
-//   { authorKey: '5fb24e67884ea877fceb11c4' },
-//   '_id key content authorKey attachmentKey likesCount commentsCount created_at updated_at '
+//   { authorKey: '53cb6b9b4f4ddef1ad47f222' },
+//   ['_id', 'key', 'content', 'authorKey', 'likesCount', 'commentsCount', 'created_at', 'updated_at ']
 // );
 
 // console.log('/...................', res);
 
 // require('module-alias/register');
-// const mongoose = require('mongoose');
 
 // const testModelCreatePost = require('~/model/post');
 
-// const res = testModelCreatePost.create({
-//   key: '53cb6b9b4f4ddef1ad47a222',
-//   content: 'Hello 2',
-//   authorKey: '5fb4c54bb6d8a050c09ec328'
-// });
+// const res = testModelCreatePost.getAllLikedUsersList(
+//   '5fd6099780da5d3d7b8ed6da',
+//   ['_id', 'likesCount', 'commentsCount', 'content', 'authorkey', 'userName']
+// );
 
 // console.log('/...................', res);
 
 // require('module-alias/register');
-// const mongoose = require('mongoose');
+
+// const testModelCreatePost = require('~/model/post');
+// const res = testModelCreatePost.getAllPostsByCategory(
+//   { category: 'category 2' },
+//   ['_id', 'key', 'content', 'authorKey', 'likesCount', 'commentsCount', 'created_at', 'updated_at ']
+// );
+
+// console.log('/...................', res);
+
+// require('module-alias/register');
+
+// const testModelCreatePost = require('~/model/post');
+
+// const res = testModelCreatePost.getAllPosts(
+//   ['_id', 'likesCount', 'commentsCount', 'content', 'authorkey', 'userName']
+// );
+
+// console.log('/...................', res);
+
+// require('module-alias/register');
 
 // const testModelCreateComment = require('~/model/comment');
 
@@ -71,34 +145,31 @@
 //   key: '53cb6b9b4f4ddef1ad47f402',
 //   content: 'comment 2',
 //   attachmentKey: '53cb6b9b4f4ddef1ad47c777',
-//   authorKey: '5fb24e67884ea877fceb11c4',
-//   postKey: '53cb6b9b4f4ddef1ad47a111',
+//   authorKey: '53cb6b9b4f4ddef1ad47f111',
+//   postKey: '53cb6b9b4f4ddef1ad47b444',
 //   likesCount: 2
 // });
 
 // console.log('/...................', res);
 
 // require('module-alias/register');
-// const mongoose = require('mongoose');
 
 // const testModelCreateComment = require('~/model/comment');
 
-// const res = testModelCreateComment.getAllUserKeysCommented(
-//   { posts: '5fb516cb4f3a2f9b00e36545' },
-//   ' authorKey '
+// const res = testModelCreateComment.getAllCommentsByPostKey(
+//   { postKey: '53cb6b9b4f4ddef1ad47b444' },
+//   [' content ', 'authorKey', 'likesCount']
 
 // );
 
 // console.log('/...................', res);
 
 // require('module-alias/register');
-// const mongoose = require('mongoose');
 
 // const testModelGetComments = require('~/model/comment');
 
 // const res = testModelGetComments.getAllUserKeysCommented(
-//   { postsId: '5fb50f95ded9d0907e6d6da3' },
-//   'key '
+//   ['authorK ']
 
 // );
 

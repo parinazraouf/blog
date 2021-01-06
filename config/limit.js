@@ -1,5 +1,4 @@
 const app = exports.app = {
-  paginationLimit: 20,
   shortTextMaxLength: 80,
   longTextMaxLength: 4096,
   passwordLengthRange: [8, 255]
@@ -12,8 +11,7 @@ exports.user = {
 
 exports.post = {
   contentLengthRange: [1, 280],
-  maxTimeToEdit: '30m',
-  maxPostAttachmentsCount: 20
+  categoryLengthRange: [1, 20]
 };
 
 exports.comment = {

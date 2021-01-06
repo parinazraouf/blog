@@ -1,48 +1,16 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const dbUrl = 'mongodb://localhost:27017/blogdb';
-mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
+require('module-alias/register');
+const db = require('~/lib/db');
 
-const commentsSchema = new Schema({
-  id: { type: Schema.Types.ObjectId, index: true },
-  key: { type: Schema.Types.ObjectId },
-  content: { type: String },
-  attachmentKey: { type: Schema.Types.ObjectId },
-  authorKey: { type: Schema.Types.ObjectId },
-  postKey: { type: Schema.Types.ObjectId },
-  likesCount: { type: Number },
-  created_at: { type: Date, default: Date.now },
-  updated_at: { type: Date, default: Date.now },
-  deleted_at: { type: Date, default: null },
-  post: [{ type: Schema.Types.ObjectId, ref: 'Posts' }],
-  user: [{ type: Schema.Types.ObjectId, ref: 'Users' }]
-});
-
-const Comments = mongoose.model('comments', commentsSchema);
+const MODEL_NAME = 'comments';
 
 /**
   * Create new comment
-  * @param {Object} data     comment data
+  * @param {Object} data     Comment data
 */
 exports.create = async (data) => {
-  const post = new Comments({
-    _id: new mongoose.Types.ObjectId()
-  });
+  const collection = await db.collection(MODEL_NAME);
 
-  const user = new Comments({
-    _id: new mongoose.Types.ObjectId()
-  });
-
-  const createComment = new Comments({
-    post: post._id,
-    user: user._id,
-    ...data
-
-  });
-
-  createComment.save(function (err) {
-    if (err) return (err);
-  });
+  return collection.insertOne(data);
 };
 
 /**
@@ -51,8 +19,9 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  Comments.findOne({ condition })
-    .then(query => Comments.updateOne({ ...data, updatedAt: Date.now() }));
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.updateOne(condition, { $set: data });
 };
 
 /**
@@ -60,49 +29,51 @@ exports.update = async (condition, data) => {
   * @param {Object} condition
 */
 exports.delete = async (condition) => {
-  Comments.deleteOne(condition, function (err) {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.deleteOne(condition, function (err) {
     if (err) console.log(err);
   });
 };
 
 /**
-  * Get comment by key
-  * @param {String} key
-  * @param {Object} projection
+  * Get comment by id
+  * @param {String} id Comment id
+  * @param {Array}  fields Comment fields
+  * @returns {Promise<Object>}
 */
-exports.getByKey = async (key, projection) => {
-  Comments.findOne(key, projection)
-    .then(res => {
-      console.log(res);
-    });
+exports.getCommentById = async (id, fields) => {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.find({ _id: db.ObjectID(id) })
+    .project(db.fieldProjector(fields))
+    .next();
 };
 
 /**
- * Get all comments by post key
- * @param {String}        postKey
- * @param {Array<String>} projection
- */
-exports.getAllByPostKey = async (postKey, projection) => {
-  Comments.find(postKey, projection)
-    .then(res => {
-      console.log(res);
-    });
+  * Get comment by key
+  * @param {Object} key
+  * @param {Array}  fields Comment fields
+  * @returns {Promise<Object>}
+*/
+exports.getCommentByKey = async (key, fields) => {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.find(key)
+    .project(db.fieldProjector(fields))
+    .next();
 };
 
 /**
- * Get all user keys that commented on this post by post key
- * @param {String} postKey
- */
+  * Get all comments by post id
+  * @param {Object} postId
+  * @param {Array}  fields Comment fields
+  * @returns {Promise<Object>}
+*/
+exports.getAllCommentsByPostId = async (postId, fields) => {
+  const collection = await db.collection(MODEL_NAME);
 
-exports.getAllUserKeysCommented = async (posts, projection) => {
-  Comments.find(posts, projection).populate('post').populate('user')
-
-  // .populate('user').populate('post').exec()
-
-    .then(res => {
-      console.log('.........................................', res);
-    });
-
-  console.log('1111111111111111111111111', posts);
-  console.log('222222222222222222222222', projection);
+  return collection.find(postId)
+    .project(db.fieldProjector(fields))
+    .toArray();
 };

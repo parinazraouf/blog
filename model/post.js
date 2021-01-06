@@ -1,54 +1,16 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const dbUrl = 'mongodb://localhost:27017/blogdb';
-mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
+require('module-alias/register');
+const db = require('~/lib/db');
 
-const postsSchema = new Schema({
-  id: { type: Schema.Types.ObjectId, index: true },
-  key: { type: Schema.Types.ObjectId },
-  content: { type: String },
-  attachmentKey: { type: Schema.Types.ObjectId },
-  authorKey: { type: Schema.Types.ObjectId },
-  likesCount: { type: Number },
-  commentsCount: { type: Number },
-  created_at: { type: Date, default: Date.now },
-  updated_at: { type: Date, default: Date.now },
-  deleted_at: { type: Date, default: null },
-  user: [{ type: Schema.Types.ObjectId, ref: 'users' }],
-  comment: [{ type: Schema.Types.ObjectId, refPath: 'Comments' }],
-  counter: [{ type: Schema.Types.ObjectId, ref: 'Counters' }]
-});
-
-const Posts = mongoose.model('posts', postsSchema);
+const MODEL_NAME = 'posts';
 
 /**
   * Create new post
-  * @param {Object} data     post data
+  * @param {Object} data     Post data
 */
 exports.create = async (data) => {
-  const user = new Posts({
-    _id: new mongoose.Types.ObjectId()
-  });
+  const collection = await db.collection(MODEL_NAME);
 
-  const comment = new Posts({
-    _id: new mongoose.Types.ObjectId()
-  });
-
-  const counter = new Posts({
-    _id: new mongoose.Types.ObjectId()
-  });
-
-  const createPost = new Posts({
-    user: user._id,
-    comment: comment._id,
-    counter: counter._id,
-    ...data
-
-  });
-
-  createPost.save(function (err) {
-    if (err) return (err);
-  });
+  return collection.insertOne(data);
 };
 
 /**
@@ -57,8 +19,9 @@ exports.create = async (data) => {
   * @param {Object} data
 */
 exports.update = async (condition, data) => {
-  Posts.findOne({ condition })
-    .then(query => Posts.updateOne({ ...data, updatedAt: Date.now() }));
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.updateOne(condition, { $set: data });
 };
 
 /**
@@ -66,43 +29,78 @@ exports.update = async (condition, data) => {
   * @param {Object} condition
 */
 exports.delete = async (condition) => {
-  Posts.deleteOne(condition, function (err) {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.deleteOne(condition, function (err) {
     if (err) console.log(err);
   });
 };
 
 /**
-  * Get post by key
-  * @param {String} key
-  * @param {Object} projection
+  * Get post by id
+  * @param {String} id Post id
+  * @param {Array}  fields Post fields
+  * @returns {Promise<Object>}
 */
-exports.getByKey = async (key, projection) => {
-  Posts.findOne(key, projection)
-    .then(res => {
-      console.log(res);
-    });
+exports.getPostById = async (id, fields) => {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.find({ _id: db.ObjectID(id) })
+    .project(db.fieldProjector(fields))
+    .next();
 };
 
 /**
-  * Get all posts by user key
-  * @param {String} authorKey
-  * @param {Object} projection
+  * Get post by key
+  * @param {Object} key
+  * @param {Array}  fields Post fields
+  * @returns {Promise<Object>}
 */
-exports.getAllPostsByUserKey = async (authorKey, projection) => {
-  Posts.find(authorKey, projection)
-    .then(res => {
-      console.log(res);
-    });
+exports.getPostByKey = async (key, fields) => {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.find(key)
+    .project(db.fieldProjector(fields))
+    .next();
 };
 
-// /**
-//   * Get all liked users list by post key
-//   * @param {String} key
-//   * @param {Object} projection
-// */
-// exports.getAllLikedUsersListSchema = async (postsId, projection) => {
-//   Posts.find({ _id: postsId, projection }).populate({ path: 'user', select: 'key phoneNumber userName displayName avatarKey' }).populate('counter')
-//     .then(res => {
-//       console.log(res);
-//     });
-// };
+/**
+  * Get all posts by author id
+  * @param {Object} authorId
+  * @param {Array}  fields Post fields
+  * @returns {Promise<Object>}
+*/
+exports.getAllPostsByAuthorId = async (authorId, fields) => {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.find(authorId)
+    .project(db.fieldProjector(fields))
+    .toArray();
+};
+
+/**
+  * Get all posts by category
+  * @param {Object} category
+  * @param {Array}  fields Post fields
+  * @returns {Promise<Object>}
+*/
+exports.getAllPostsByCategory = async (category, fields) => {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.find(category)
+    .project(db.fieldProjector(fields))
+    .toArray();
+};
+
+/**
+  * Get all posts
+  * @param {Array}  fields Post fields
+  * @returns {Promise<Object>}
+*/
+exports.getAllPosts = async (fields) => {
+  const collection = await db.collection(MODEL_NAME);
+
+  return collection.find()
+    .project(db.fieldProjector(fields))
+    .toArray();
+};

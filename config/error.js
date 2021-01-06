@@ -15,14 +15,6 @@ exports.app = {
     }
   ],
 
-  invalidInput: [
-    400,
-    'input is invalid',
-    {
-      code: 'invalidInput'
-    }
-  ],
-
   badRequest: [
     400,
     'bad request',
@@ -65,15 +57,8 @@ exports.post = {
     {
       code: 'postNotFound'
     }
-  ],
-
-  postEditHasExpired: [
-    403,
-    'post edit has been expired',
-    {
-      code: 'postEditHasExpired'
-    }
   ]
+
 };
 
 exports.comment = {

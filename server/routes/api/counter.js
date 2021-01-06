@@ -6,10 +6,10 @@ const counterModel = require('~/model/counter');
 
 const properties = {
   counter: [
-    'targetKey',
+    'targetId',
     'targetType',
     'counterField',
-    'userKey',
+    'userId',
     'value',
     'createdAt',
     'updatedAt'
@@ -18,10 +18,10 @@ const properties = {
 
 module.exports = router => {
   const addCounterSchema = Joi.object().keys({
-    targetKey: Joi.string().uuid({ version: 'uuidv4' }).required(),
-    targetType: Joi.number().valid(Object.values(counterEnum.targetType)).required(),
+    targetId: Joi.string().required(),
+    targetType: Joi.number().valid(...Object.values(counterEnum.targetType)).required(),
     counterField: Joi.string().required(),
-    userKey: Joi.string().uuid({ version: 'uuidv4' }).required(),
+    userId: Joi.string().required(),
     value: Joi.number().min(1).max(5)
   });
 
@@ -30,20 +30,30 @@ module.exports = router => {
 
     const res = await counterModel.upsert(data);
 
-    ctx.bodyOk(res);
+    ctx.body = !!res;
   });
 
-  const getCountersByTargetKeySchema = Joi.object().keys({
-    targetKey: Joi.string().uuid({ version: 'uuidv4' }).required()
+  const getCounterByTargetIdSchema = Joi.object().keys({
+    targetId: Joi.string().required()
   });
 
-  router.get('/counter/target/:targetKey', async ctx => {
-    const {
-      targetKey
-    } = Joi.attempt(ctx.params, getCountersByTargetKeySchema);
+  router.get('/counter/target/:targetId', async ctx => {
+    const { targetId } = Joi.attempt({ targetId: ctx.params.targetId }, getCounterByTargetIdSchema);
 
-    const res = await counterModel.getByTarget(targetKey, properties.counter);
+    const res = await counterModel.getCounterByTarget({ targetId }, properties.counter);
 
-    ctx.bodyOk(res);
+    ctx.body = res;
+  });
+
+  const getCounterByIdSchema = Joi.object().keys({
+    id: Joi.string().required()
+  });
+
+  router.get('/counter/id/:id', async ctx => {
+    const { id } = Joi.attempt({ id: ctx.params.id }, getCounterByIdSchema);
+
+    const res = await counterModel.getCounterById(id, properties.counter);
+
+    ctx.body = res;
   });
 };
