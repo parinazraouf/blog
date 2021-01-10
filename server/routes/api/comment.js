@@ -152,4 +152,24 @@ module.exports = router => {
 
     ctx.body = res;
   });
+
+  const likeCommentSchema = Joi.object().keys({
+    _id: Joi.string().required()
+  });
+
+  router.get('/comment/like/:_id', async ctx => {
+    const { _id } = Joi.attempt({ _id: ctx.params._id }, likeCommentSchema);
+
+    // Check comment existence
+    const comment = await commentModel.getCommentById(_id, properties.comment);
+
+    httpInvariant(comment, ...commentError.commentNotFound);
+
+    await commentModel.update({ _id: db.ObjectID(_id) }, { likesCount: +comment.likesCount + 1 });
+
+    // Total count
+    const total = +comment.likesCount + 1;
+
+    ctx.body = { total };
+  });
 };

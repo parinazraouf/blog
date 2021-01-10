@@ -199,4 +199,24 @@ module.exports = router => {
 
     ctx.body = post;
   });
+
+  const likePostSchema = Joi.object().keys({
+    _id: Joi.string().required()
+  });
+
+  router.get('/post/like/:_id', async ctx => {
+    const { _id } = Joi.attempt({ _id: ctx.params._id }, likePostSchema);
+
+    // Check post existence
+    const post = await postModel.getPostById(_id, properties.post);
+
+    httpInvariant(post, ...postError.postNotFound);
+
+    await postModel.update({ _id: db.ObjectID(_id) }, { likesCount: +post.likesCount + 1 });
+
+    // Total count
+    const total = +post.likesCount + 1;
+
+    ctx.body = { total };
+  });
 };
