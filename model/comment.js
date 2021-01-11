@@ -1,4 +1,3 @@
-require('module-alias/register');
 const db = require('~/lib/db');
 
 const MODEL_NAME = 'comments';

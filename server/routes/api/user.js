@@ -1,5 +1,3 @@
-require('module-alias/register');
-
 const db = require('~/lib/db');
 const { httpInvariant } = require('~/lib/error');
 const { Joi } = require('~/lib/validate');

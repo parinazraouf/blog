@@ -1,4 +1,6 @@
 const app = exports.app = {
+  paginationLimit: 10,
+  pageSize: 10,
   shortTextMaxLength: 80,
   longTextMaxLength: 4096,
   passwordLengthRange: [8, 255]
